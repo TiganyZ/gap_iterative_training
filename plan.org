@@ -6,6 +6,8 @@
 - This can use the ~ase~ framework to create structures
 - Another aim is to feed it into the NEB and be able to get that part
 
+* check
+
 * Process
 ** Create Structures
 ** Perform a GAP calculation
