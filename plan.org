@@ -1,0 +1,62 @@
+#+TITLE: General Iterative Training framework
+#+AUTHOR: Tigany Zarrouk
+
+* Aim
+- Purpose is to create a /general framework/ for =training= and =retraining= GAPs with new DFT data
+- This can use the ~ase~ framework to create structures
+- Another aim is to feed it into the NEB and be able to get that part
+
+* Process
+** Create Structures
+** Perform a GAP calculation
+** Convert output from GAP to format for DFT
+** Perform DFT calculation
+** Retrain GAP with DFT data
+* Object Structure
+
+** Pseudocode
+#+begin_src julia
+
+struc = Structure( species, positions, periodicity )
+gap   = calculation( calculation_type="GAP", source="some/directory/gap_files"  )
+
+# Now compose the structures and the calculation type
+# > Run GAP calculation with structure
+r = Run( gap, structure )
+r.run() # This will create a directory for the files etc
+
+
+# Generalise the the RunNEB class
+
+n = RunNEB( [ Run(gap, struc1), Run(gap, struc2)... ]  )
+
+# Now one can get the data from the NEB runs
+
+n.get_final_images() # This has the energy and the configuration
+tst = n.get_tst() # This is a structure type
+
+
+# Now feed this into a DFT calculation
+
+dft = calculation(calculation_type = "VASP")
+d = Run( dft, tst )
+d.run()
+
+# Now get the data from the DFT run and the gap info to retrain
+data = ProcessData( type="FitGAP", d  ) # Know that there is a DFT calculation so will extract energy from there
+data.extract()
+
+retrain = RefitGAP( data, gap )
+
+
+#+end_src
+
+
+
+** Structure (type with file format)
+** Calculation (abstract type) [Factory method]
+*** GAP method
+*** DFT method
+** Pipeline to get the data from each method
+** Controller (oversees the general structure)
+** Train (given gap and DFT data, trains a new GAP)
