@@ -199,6 +199,7 @@ if __name__ == "__main__":
 
         args ={ "binary"              : binary,
                 "potential_directory" : potential_directory,
+                "input_directory"     : input_directory,
                 "output_directory"    : output_directory,
                 "structure"           : structure,
                 "input_args"          : vasp_input_args,
