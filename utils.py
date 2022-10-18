@@ -19,7 +19,7 @@ class Utils:
     def check_keys(dic, keys = ( "input_directory", "potential_directory", "output_directory" )):
 
         for key in keys:
-            if not self.utils.check_key(dic, key):
+            if not self.check_key(dic, key):
                 print("""
                 ########################################################
                 ###---   WARNING! The key = {key} is not found!   ---###
