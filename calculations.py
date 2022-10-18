@@ -179,6 +179,7 @@ if __name__ == "__main__":
         potential_directory = "./input_dir"
 
         binary = "turbogap"
+        ncores = 128
 
         structure = read(f"{input_directory}/POSCAR", format="vasp")
 
