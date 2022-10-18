@@ -206,6 +206,6 @@ if __name__ == "__main__":
 
         calculation_method = GapCalc
 
-        c = CalculationContainer(calculation_method  = calculation_method, args )
+        c = CalculationContainer(calculation_method, args )
 
         c.run()
