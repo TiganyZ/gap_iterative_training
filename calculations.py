@@ -92,6 +92,7 @@ class GapCalc( Calculation ):
     def __init__(self, args):
         self.name = "GapCalc"
         self.args = args
+        self.utils = Utils()
 
     def setup(self):
         # Copy gap files from directory to where the calculation is
@@ -205,7 +206,7 @@ if __name__ == "__main__":
 
         }
 
-        calculation_method = GapCalc
+        calculation_method = VaspCalc
 
         c = CalculationContainer(calculation_method, args )
 
