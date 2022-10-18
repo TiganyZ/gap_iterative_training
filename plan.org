@@ -17,7 +17,7 @@
 * Object Structure
 
 ** Pseudocode
-#+begin_src julia
+#+begin_src py
 
 struc = Structure( species, positions, periodicity )
 gap   = calculation( calculation_type="GAP", source="some/directory/gap_files"  )
