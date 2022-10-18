@@ -9,13 +9,7 @@ from ase.calculators.vasp import Vasp
 import os, shutil, subprocess
 
 from utils import Utils
-from process_calculation import GAP_to_VASP, VASP_to_GAP
-#################################
-###---   Structure Class   ---###
-#################################
-# > Perhaps with this, one can make it dependent on the ase
-# > classes/subclasses used for the objects.
-
+# from process_calculation import GAP_to_VASP, VASP_to_GAP
 
 
 class Calculation(ABC):
@@ -23,6 +17,7 @@ class Calculation(ABC):
     @abstractmethod
     def setup():
         pass
+
     @abstractmethod
     def get_energy():
         pass
@@ -147,11 +142,8 @@ class CalculationContainer:
         self.potential_directory = potential_directory
         # self.images = sorted(os.listdir(self.potential_directory))
 
-        self.output_directory = output_directory
-
         args = { "binary": binary,
                  "input_directory": input_directory,
-                 "output_directory": output_directory,
                  "potential_directory": potential_directory,
                  "structure": structure,
                  "input_args": input_args
@@ -162,6 +154,9 @@ class CalculationContainer:
 
         now = datetime.now()
         self.dt = now.strftime("%Y-%m-%d--%H-%M-%S")
+
+        self.output_directory = self.create_output_directory()
+        self.method.args["output_directory"] = self.output_directory
 
         self.run_setup = False
         self.run_energy = False
@@ -176,7 +171,6 @@ class CalculationContainer:
 
 
     def run(self):
-        self.create_output_directory()
 
         self.method.setup()
         self.run_setup = True
@@ -186,3 +180,40 @@ class CalculationContainer:
 
         self.method.get_data()
         self.run_get_data = True
+
+
+if __name__ == "__main__":
+
+
+    input_directory = "./input_dir"
+    output_directory = "./output_dir"
+    potential_directory = "./gap_files"
+
+    binary = "turbogap"
+
+    structure = read("POSCAR", format="vasp")
+
+    vasp_input_args = {"prec" : 'Accurate',
+                        "xc" : 'PBE',
+                        "ibrion" : = -1,
+                        "algo" : = 'Normal',
+                        "potim" : = 1.0,
+                        "ediff" : = 1e-6,
+                        "lwave" : False,
+                        "lcharg" : False,
+                        "ncore" : 16,
+                        "kpar" : 4
+    }
+
+
+    calculation_method = GapCalc
+
+    c = CalculationContainer(calculation_method  = calculation_method,
+                             binary              = binary,
+                             potential_directory = potential_directory,
+                             output_directory    = output_directory,
+                             structure           = structure,
+                             input_args          = vasp_input_args
+                             )
+
+    c.run()

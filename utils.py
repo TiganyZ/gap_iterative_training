@@ -51,7 +51,7 @@ class Utils:
 
             self.check_subprocess(p)
 
-        out, errs = proc.communicate()
+        out, errs = p.communicate()
         return out
 
     def check_subprocess(self, out):
