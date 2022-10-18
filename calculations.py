@@ -38,7 +38,7 @@ class VaspCalc( Calculation ):
 
     def setup(self):
         # Copy gap files from directory to where the calculation is
-        self.utils.check_keys()
+        self.utils.check_keys(self.args)
 
         pot_dir = self.args["potential_directory"]
         out_dir = self.args["output_directory"]
@@ -96,7 +96,7 @@ class GapCalc( Calculation ):
 
     def setup(self):
         # Copy gap files from directory to where the calculation is
-        self.utils.check_keys()
+        self.utils.check_keys(self.args)
 
         pot_dir = self.args["potential_directory"]
         out_dir = self.args["output_directory"]
@@ -112,7 +112,7 @@ class GapCalc( Calculation ):
 
 
     def get_energy(self):
-        self.utils.check_keys(("system",))
+        self.utils.check_keys(self.args, ("system",))
         gap = Potential(param_filename=f'{self.args["system"]}.xml')
 
         # Read the configurations
