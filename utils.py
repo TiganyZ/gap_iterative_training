@@ -4,7 +4,7 @@ import os, subprocess
 
 class Utils:
 
-    def check_key(dic, key):
+    def check_key(self, dic, key):
         print(f" > checkkey: is key = {key} present?")
         ret = False
         if key in dic.keys():
@@ -16,7 +16,7 @@ class Utils:
             ret = False
         return ret
 
-    def check_keys(dic, keys = ( "input_directory", "potential_directory", "output_directory" )):
+    def check_keys(self, dic, keys = ( "input_directory", "potential_directory", "output_directory" )):
 
         for key in keys:
             if not self.check_key(dic, key):
@@ -26,7 +26,7 @@ class Utils:
                 ########################################################\n   --> Exiting <--\n""")
                 exit(1)
 
-    def check_file(directory, file):
+    def check_file(self, directory, file):
         if not os.path.exists(f"{directory}/{file}"):
             print(f"""
             ################################################################
@@ -36,7 +36,7 @@ class Utils:
         else:
             return True
 
-    def check_copy_file(directory, file, output_directory):
+    def check_copy_file(self, directory, file, output_directory):
         if self.check_file(directory, file) and os.path.exists(f"{output_directory}"):
             shutil.copy( f"{directory}/{file}", f"{out_dir}/" )
 
