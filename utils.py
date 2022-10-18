@@ -5,7 +5,7 @@ import os, subprocess
 class Utils:
 
     def check_key(self, dic, key):
-        print(f" > checkkey: is key = {key} present?")
+        print(f" > checkkey: is key = \"{key}\" present?")
         ret = False
         if key in dic.keys():
             print("Present, ", end =" ")
@@ -20,7 +20,7 @@ class Utils:
 
         for key in keys:
             if not self.check_key(dic, key):
-                print("""
+                print(f"""\n{dic}\n\n
                 ########################################################
                 ###---   WARNING! The key = {key} is not found!   ---###
                 ########################################################\n   --> Exiting <--\n""")
