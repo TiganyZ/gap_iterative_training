@@ -180,7 +180,7 @@ if __name__ == "__main__":
 
         binary = "turbogap"
 
-        structure = read("POSCAR", format="vasp")
+        structure = read(f"{input_directory}/POSCAR", format="vasp")
 
         vasp_input_args = {"prec" : 'Accurate',
                             "xc" : 'PBE',
