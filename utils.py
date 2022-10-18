@@ -26,6 +26,7 @@ class Utils:
                 ########################################################\n   --> Exiting <--\n""")
                 exit(1)
 
+
     def check_file(self, directory, file):
         if not os.path.exists(f"{directory}/{file}"):
             print(f"""

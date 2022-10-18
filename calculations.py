@@ -7,6 +7,7 @@ from ase import Atoms
 from ase.io import read, write
 from ase.calculators.vasp import Vasp
 import os, shutil, subprocess
+from quippy.potential import Potential
 
 from utils import Utils
 # from process_calculation import GAP_to_VASP, VASP_to_GAP
@@ -112,14 +113,30 @@ class GapCalc( Calculation ):
 
 
     def get_energy(self):
-        self.utils.check_keys(self.args, ("system",))
-        gap = Potential(param_filename=f'{self.args["system"]}.xml')
+        if self.utils.check_key(self.args, "quip"):
+            energy = self.get_energy_quip()
+        else:
+            # Use turbogap
+            energy = 0.0
 
+        return energy
+
+    def get_energy_quip(self):
+        if self.utils.check_key(self.args, "system"):
+            gap = Potential(param_filename=f'{self.args["potential_directory"]}/{self.args["system"]}.xml')
+        else:
+            print(f"""
+            ##############################################################################################
+            ###---   WARNING: There is no system specified for this GAP calculation. Rectify this   ---###
+            ##############################################################################################
+            """)
+            exit(1)
         # Read the configurations
         structure = self.args["structure"]
         structure.set_calculator(gap)
         energy = structure.get_potential_energy()
 
+        print(f">>> GAP with QUIP: energy  = {energy} <<< ")
         return energy
 
 
@@ -170,7 +187,39 @@ class CalculationContainer:
 
 if __name__ == "__main__":
 
-    test="Vasp"
+    test = "Vasp"
+    test = "Gap"
+
+
+    if test == "Gap":
+
+        input_directory = "./input_dir"
+        output_directory = "./output_dir"
+        potential_directory = "./input_dir"
+
+        binary = "turbogap"
+        ncores = 128
+
+        structure = read(f"{input_directory}/POSCAR", format="vasp")
+
+        gap_input_args = {"quip" : True}
+
+
+        args ={ "binary"              : binary,
+                "potential_directory" : potential_directory,
+                "input_directory"     : input_directory,
+                "output_directory"    : output_directory,
+                "structure"           : structure,
+                "input_args"          : gap_input_args,
+                "ncores"              : ncores
+
+        }
+
+        calculation_method = VaspCalc
+
+        c = CalculationContainer(calculation_method, args )
+
+        c.run()
 
 
     if test == "Vasp":
@@ -179,7 +228,7 @@ if __name__ == "__main__":
         output_directory = "./output_dir"
         potential_directory = "./input_dir"
 
-        binary = "turbogap"
+        binary = "/appl/soft/phys/vasp/6.3.0/gcc-11.2.0/bin/vasp_std"
         ncores = 128
 
         structure = read(f"{input_directory}/POSCAR", format="vasp")
