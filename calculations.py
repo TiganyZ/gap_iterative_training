@@ -218,6 +218,7 @@ if __name__ == "__main__":
 
         gap_input_args = {"quip" : True}
 
+        system = "CBr"
 
         args ={ "binary"              : binary,
                 "potential_directory" : potential_directory,
@@ -225,7 +226,8 @@ if __name__ == "__main__":
                 "output_directory"    : output_directory,
                 "structure"           : structure,
                 "input_args"          : gap_input_args,
-                "ncores"              : ncores
+                "ncores"              : ncores,
+                "system"              : system
 
         }
 
