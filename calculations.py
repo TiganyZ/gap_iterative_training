@@ -106,8 +106,17 @@ class GapCalc( Calculation ):
 
         # self.utils.check_copy_file(input_dir, "input", out_dir)
 
-        shutil.copytree( f"{pot_dir}", f"{out_dir}/" )
         shutil.copytree( f"{input_dir}/", f"{out_dir}/" )
+        if f"{input_dir}" == f"{out_dir}":
+            print("""
+            ########################################################################################################
+            ###---   WARNING: Input dir is the same as the potential dir for the gap calculation. Not copying.---###
+            ###---            Usually this path should be a gap_files directory                               ---###
+            ########################################################################################################
+
+            """)
+        else:
+            shutil.copytree( f"{pot_dir}", f"{out_dir}/" )
 
         self.cwd = os.getcwd()
         os.chdir( out_dir )
@@ -162,6 +171,7 @@ class CalculationContainer:
             output_directory = self.create_output_directory()
             self.method.args["output_directory"] = output_directory
 
+
         self.run_setup = False
         self.run_energy = False
         self.run_get_data = False
@@ -196,7 +206,7 @@ if __name__ == "__main__":
 
         input_directory = "./input_dir"
         output_directory = "./output_dir"
-        potential_directory = "./input_dir"
+        potential_directory = "./input_dir/gap_files"
 
         binary = "turbogap"
         ncores = 128
