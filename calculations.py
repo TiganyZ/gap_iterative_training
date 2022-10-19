@@ -216,7 +216,7 @@ if __name__ == "__main__":
 
         }
 
-        calculation_method = VaspCalc
+        calculation_method = GapCalc
 
         c = CalculationContainer(calculation_method, args )
 
