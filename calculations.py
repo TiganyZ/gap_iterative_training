@@ -7,6 +7,7 @@ from ase import Atoms
 from ase.io import read, write
 from ase.calculators.vasp import Vasp
 import os, shutil, subprocess
+import quippy
 from quippy.potential import Potential
 
 from utils import Utils
