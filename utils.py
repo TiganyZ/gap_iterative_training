@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 import os, subprocess, shutil
+from glob import glob
 
 
 class Utils:
@@ -25,6 +26,27 @@ class Utils:
                 ###---   WARNING! The key = {key} is not found!   ---###
                 ########################################################\n   --> Exiting <--\n""")
                 exit(1)
+
+
+
+    def check_copy_tree(self, src, dst):
+        # Check that directory dst does not exist
+        if not os.path.exists(dst):
+            shutil.copytree(src, dst)
+        else:
+            ldst = glob(f"{dst}/*/", recursive = True)
+            lsrc = glob(f"{src}/*/", recursive = True)
+
+            for dir in lsrc:
+                if dir in ldst:
+                    print(f"check_copy_tree: {src}/{dir} has same name as {dst}/dir. Copying just the files")
+                    for f in os.listdir(src):
+                        if os.path.isfile(f):
+                            end_dir = dir.split("/")[-1]
+                            print(f"check_copy_tree: copying {src}/{f} to {dst}/{end_dir}/")
+                            shutil.copy(f, f"{dst}/{end_dir}/")
+
+        
 
 
     def check_file(self, directory, file):

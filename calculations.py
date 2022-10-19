@@ -106,8 +106,9 @@ class GapCalc( Calculation ):
 
         # self.utils.check_copy_file(input_dir, "input", out_dir)
 
-        shutil.copytree( f"{input_dir}/", f"{out_dir}/" )
-        if f"{input_dir}" == f"{out_dir}":
+        self.utils.check_copy_tree(input_dir, out_dir)
+
+        if f"{input_dir}" == f"{pot_dir}":
             print("""
             ########################################################################################################
             ###---   WARNING: Input dir is the same as the potential dir for the gap calculation. Not copying.---###
@@ -116,10 +117,7 @@ class GapCalc( Calculation ):
 
             """)
         else:
-            end_dir = pot_dir.split("/")[-1]
-            if not os.path.exists(f"{out_dir}/{end_dir}"):
-                shutil.copytree( f"{pot_dir}", f"{out_dir}/" )
-
+            self.utils.check_copy_tree(pot_dir, out_dir)
 
         self.cwd = os.getcwd()
         os.chdir( out_dir )
