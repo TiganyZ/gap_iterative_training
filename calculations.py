@@ -116,10 +116,12 @@ class GapCalc( Calculation ):
             ########################################################################################################
 
             """)
-        else:
-            self.utils.check_copy_tree(pot_dir, out_dir)
+         # else:
+
+         #    shutil.copy(pot_dir, out_dir)
 
         self.cwd = os.getcwd()
+        print(self.cwd, out_dir)
         os.chdir( out_dir )
 
 
