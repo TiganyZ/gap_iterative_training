@@ -116,7 +116,10 @@ class GapCalc( Calculation ):
 
             """)
         else:
-            shutil.copytree( f"{pot_dir}", f"{out_dir}/" )
+            end_dir = pot_dir.split("/")[-1]
+            if not os.path.exists(f"{out_dir}/{end_dir}"):
+                shutil.copytree( f"{pot_dir}", f"{out_dir}/" )
+
 
         self.cwd = os.getcwd()
         os.chdir( out_dir )
@@ -204,9 +207,9 @@ if __name__ == "__main__":
 
     if test == "Gap":
 
-        input_directory = "./input_dir"
-        output_directory = "./output_dir"
-        potential_directory = "./input_dir/gap_files"
+        input_directory = "input_dir"
+        output_directory = "output_dir"
+        potential_directory = "input_dir/gap_files"
 
         binary = "turbogap"
         ncores = 128
@@ -235,9 +238,9 @@ if __name__ == "__main__":
 
     if test == "Vasp":
 
-        input_directory = "./input_dir"
-        output_directory = "./output_dir"
-        potential_directory = "./input_dir"
+        input_directory = "input_dir"
+        output_directory = "output_dir"
+        potential_directory = "input_dir"
 
         binary = "/appl/soft/phys/vasp/6.3.0/gcc-11.2.0/bin/vasp_std"
         ncores = 128
