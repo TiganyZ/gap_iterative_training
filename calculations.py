@@ -120,9 +120,9 @@ class GapCalc( Calculation ):
             # Copy all the xml files to the directory from the potential directory
             self.utils.copy_only_files(pot_dir, out_dir)
         else:
-            if not os.path.exists(f'self.args["output_directory"]}/gap_files'):
-                os.mkdir(f'{out_dir}}/gap_files')
-            self.utils.copy_only_files(pot_dir, f'{out_dir}}/gap_files')
+            if not os.path.exists(f'{out_dir}/gap_files'):
+                os.mkdir(f'{out_dir}/gap_files')
+            self.utils.copy_only_files(pot_dir, f'{out_dir}/gap_files')
 
 
 
