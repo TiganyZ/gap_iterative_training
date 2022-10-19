@@ -46,7 +46,12 @@ class Utils:
                             print(f"check_copy_tree: copying {src}/{f} to {dst}/{end_dir}/")
                             shutil.copy(f, f"{dst}/{end_dir}/")
 
-        
+    def copy_only_files(self, src, dst):
+        files = os.listdir(src)
+            for f in files:
+                if os.path.isfile(f):
+                    shutil.copy(f, f"{dst}/")
+
 
 
     def check_file(self, directory, file):
@@ -61,7 +66,7 @@ class Utils:
 
     def check_copy_file(self, directory, file, output_directory):
         if self.check_file(directory, file) and os.path.exists(f"{output_directory}"):
-            shutil.copy( f"{directory}/{file}", f"{out_dir}/" )
+            shutil.copy( f"{directory}/{file}", f"{output_directory}/" )
 
     def piped_subprocess(self, commands, file=None):
         for i, cmd in enumerate(commands.split("|")):

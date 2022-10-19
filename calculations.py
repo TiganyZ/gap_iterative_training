@@ -116,12 +116,17 @@ class GapCalc( Calculation ):
             ########################################################################################################
 
             """)
-         # else:
+        if self.utils.check_key(self.args["input_args"], "quip"):
+            # Copy all the xml files to the directory from the potential directory
+            self.utils.copy_only_files(pot_dir, out_dir)
+        else:
+            if not os.path.exists(f'self.args["output_directory"]}/gap_files'):
+                os.mkdir(f'{out_dir}}/gap_files')
+            self.utils.copy_only_files(pot_dir, f'{out_dir}}/gap_files')
 
-         #    shutil.copy(pot_dir, out_dir)
+
 
         self.cwd = os.getcwd()
-        print(self.cwd, out_dir)
         os.chdir( out_dir )
 
 
@@ -136,7 +141,7 @@ class GapCalc( Calculation ):
 
     def get_energy_quip(self):
         if self.utils.check_key(self.args, "system"):
-            gap = Potential(param_filename=f'{self.args["potential_directory"]}/{self.args["system"]}.xml')
+            gap = Potential(param_filename=f'{self.args["system"]}.xml')
         else:
             print(f"""
             ##############################################################################################
