@@ -114,7 +114,7 @@ class GapCalc( Calculation ):
 
 
     def get_energy(self):
-        if self.utils.check_key(self.args, "quip"):
+        if self.utils.check_key(self.args["input_args"], "quip"):
             energy = self.get_energy_quip()
         else:
             # Use turbogap
