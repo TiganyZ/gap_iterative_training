@@ -130,7 +130,8 @@ exitcode = os.system('srun -n {ncores} {binary}')
 """)
 
         cwd = os.getcwd()
-        os.environ["VASP_SCRIPT"]=f"{cwd}/run_vasp.py"
+
+        os.environ["VASP_SCRIPT"]=f"run_vasp.py"
 
 
 
