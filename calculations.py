@@ -335,7 +335,8 @@ if __name__ == "__main__":
                             "lwave" : False,
                             "lcharg" : False,
                             "ncore" : 16,
-                            "kpar" : 4
+                            "kpar" : 4,
+                            "txt": "OUTCAR_test"
         }
 
 

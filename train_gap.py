@@ -55,12 +55,13 @@ class Train:
                 append = True
 
         # Now append this to a previous file
-        self.utils.check_keys(self.info, ("previous_database",))
+        self.utils.check_key(self.info, "previous_database", stop=True)
 
         with open(self.train_file_name, "w") as f:
             out = subprocess.run(["cat", f"{self.info['previous_database']}", f"{self.dbs_name}.xyz"], stdout=f)
             self.utils.check_subprocess(out)
 
+        self.get_data_from_database(self.train_file_name)
 
 
 
@@ -248,10 +249,10 @@ e0 = {self.e0}
 
     def setup(self):
 
-        self.wrap_function( self.create_dbs,     "Creating database")
-        self.wrap_function( self.add_tags,       "Adding tags")
-        self.wrap_function( self.make_gap_files, "Converting gap_fit to turbogap")
-
+        self.wrap_function( self.create_dbs,      "Creating database")
+        self.wrap_function( self.add_tags,        "Adding tags")
+        self.wrap_function( self.make_gap_files,  "Converting gap_fit to turbogap")
+        self.wrap_function( self.create_train_sh, "Creating train.sh file")
 
         return
 
