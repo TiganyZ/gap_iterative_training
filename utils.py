@@ -48,9 +48,9 @@ class Utils:
 
     def copy_only_files(self, src, dst):
         files = os.listdir(src)
-            for f in files:
-                if os.path.isfile(f):
-                    shutil.copy(f, f"{dst}/")
+        for f in files:
+            if os.path.isfile(f):
+                shutil.copy(f, f"{dst}/")
 
 
 
