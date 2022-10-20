@@ -268,7 +268,7 @@ class CalculationContainer:
 
         self.method.calculate()
         self.run_calculation = True
-        self.method.result["method"] = method_name
+        self.method.result["method"] = self.method_name
 
         self.method.get_data()
         self.run_get_data = True
