@@ -6,16 +6,14 @@ from glob import glob
 class Utils:
 
     def check_key(self, dic, key):
-        print(f" > checkkey: is key = \"{key}\" present?")
         ret = False
         if key in dic.keys():
-            print("Present, ", end =" ")
-            print("value =", dic[key])
             ret = True
         else:
-            print(f" {key} Not present")
             ret = False
         return ret
+
+
 
     def check_keys(self, dic, keys = ( "input_directory", "potential_directory", "output_directory" )):
 
@@ -81,8 +79,9 @@ class Utils:
             print(f"""
             ################################################################
             ###---   WARNING! There is no path {directory}/{file} !   ---###
-            ################################################################\n\n  --> Rectify this <--\n  I'm leaving you...""")
+            ################################################################\n""")
             if stop:
+                print("\n  --> Rectify this <--\n  I'm leaving you...")
                 exit(1)
             else:
                 return False

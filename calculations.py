@@ -14,6 +14,7 @@ from utils import Utils
 # from process_calculation import GAP_to_VASP, VASP_to_GAP
 
 
+
 class Calculation(ABC):
 
     @abstractmethod
@@ -21,7 +22,7 @@ class Calculation(ABC):
         pass
 
     @abstractmethod
-    def get_energy():
+    def calculate():
         pass
 
     @abstractmethod
@@ -29,6 +30,58 @@ class Calculation(ABC):
         pass
 
 
+class CalculationUtils:
+    def __init__(self):
+        self.utils = Utils()
+
+
+    def get_structure(self, args):
+
+        if self.utils.check_key(args, "structure" ):
+            return args["structure"]
+        else:
+            print("""
+            ########################################################################################
+            ###---   WARNING: Structure not passed to arguments. Specify before calculation   ---###
+            ########################################################################################
+            """)
+            return None
+
+
+    def determine_calculation_type(self, args):
+        calc_types = [ "energy" ]
+
+        calc_type = "energy"
+        for c in calc_types:
+            if self.utils.check_key(args, c):
+                calc_type = c
+
+        return calc_type
+
+
+    def run(self, structure, args):
+
+        calc_type = self.determine_calculation_type(args)
+
+        if structure is None:
+            print(f"""
+            ###############################################################################
+            ###---   FATAL: Structure not provided for the {calc_type} calculation   ---###
+            ###############################################################################
+            """)
+            exit(1)
+
+        result = {"calc_type" : calc_type}
+
+        if calc_type == "energy":
+            res =  structure.get_potential_energy()
+
+
+        result["result"] = res
+
+        print(result)
+        return result
+        
 
 class VaspCalc( Calculation ):
 
@@ -36,6 +89,10 @@ class VaspCalc( Calculation ):
         self.name = "VaspCalc"
         self.args = args
         self.utils = Utils()
+        self.calc_utils = CalculationUtils()
+        self.result = {}
+
+        self.structure = self.calc_utils.get_structure()
 
 
     def setup(self):
@@ -75,19 +132,23 @@ exitcode = os.system('srun -n {ncores} {binary}')
         os.environ["VASP_SCRIPT"]=f"{cwd}/run_vasp.py"
 
 
-    def get_energy(self):
+
+
+
+    def calculate(self):
         # Create the input file for the directory and then compute
         self.utils.check_keys(self.args, keys=( "structure", "input_args" ) )
 
-        structure = self.args["structure"]
-        structure.calc = Vasp( **self.args["input_args"] )
-        energy = structure.get_potential_energy()
+        self.structure.calc = Vasp( **self.args["input_args"] )
 
-        return energy
+        self.result = self.calc_utils.run(self.structure, self.args)
+
+        return self.result
 
 
     def get_data(self):
         pass
+
 
 class GapCalc( Calculation ):
 
@@ -95,6 +156,10 @@ class GapCalc( Calculation ):
         self.name = "GapCalc"
         self.args = args
         self.utils = Utils()
+        self.calc_utils = CalculationUtils()
+        self.result = {}
+
+        self.structure = self.calc_utils.get_structure()
 
     def setup(self):
         # Copy gap files from directory to where the calculation is
@@ -130,40 +195,22 @@ class GapCalc( Calculation ):
         os.chdir( out_dir )
 
 
-    def get_energy(self):
+
+    def calculate(self):
+        # Create the input file for the directory and then compute
+        self.utils.check_keys(self.args, keys=( "structure", "input_args" ) )
+
         if self.utils.check_key(self.args["input_args"], "quip"):
-            energy = self.get_energy_quip()
+            self.setup_quip()
         else:
-            # Use turbogap
-            energy = 0.0
+            self.setup_turbogap()
 
-        return energy
+        self.result = self.calc_utils.run(self.structure, self.args)
 
-
-    def get_gap_potential_file(self, pot_file, subdir="gap_files"):
-        if self.utils.check_file('.', pot_file):
-            print(f"""
-            -->   Found GAP potential file {pot_file} in ./ directory    <--
-            """)
-        elif self.utils.check_file(subdir, pot_file):
-            print(f"""
-            -->   Found GAP potential file {pot_file} in {subdir} subdirectory    <--
-            """)
-            pot_file = f"{subdir}/{pot_file}"
-        else:
-            print(f"""
-                ####################################################################################################
-                ###---   FATAL: No {self.args["system"]}.xml file in directory or gap_files subdirectory.    ---###
-                ####################################################################################################
-                """)
-            exit(1)
+        return self.result
 
 
-        gap = Potential(param_filename=pot_file)
-
-        return gap
-
-    def get_energy_quip(self):
+    def setup_quip(self):
         if self.utils.check_key(self.args, "system"):
             pot_file = self.utils.check_file_dir_subdir(f'{self.args["system"]}.xml')
             gap = Potential(param_filename=pot_file)
@@ -175,13 +222,10 @@ class GapCalc( Calculation ):
             """)
             exit(1)
         # Read the configurations
-        structure = self.args["structure"]
-        structure.set_calculator(gap)
-        energy = structure.get_potential_energy()
+        self.structure.set_calculator(gap)
 
-        print(f">>> GAP with QUIP: energy  = {energy} <<< ")
-        return energy
-
+    def setup_turbogap(self):
+        pass
 
     def get_data(self):
         pass
@@ -206,7 +250,7 @@ class CalculationContainer:
 
 
         self.run_setup = False
-        self.run_energy = False
+        self.run_calculation = False
         self.run_get_data = False
 
 
@@ -222,8 +266,9 @@ class CalculationContainer:
         self.method.setup()
         self.run_setup = True
 
-        self.method.get_energy()
-        self.run_energy = True
+        self.method.calculate()
+        self.run_calculation = True
+        self.method.result["method"] = method_name
 
         self.method.get_data()
         self.run_get_data = True
@@ -254,8 +299,8 @@ if __name__ == "__main__":
                 "potential_directory" : potential_directory,
                 "input_directory"     : input_directory,
                 "output_directory"    : output_directory,
-                "structure"           : structure,
                 "input_args"          : gap_input_args,
+                "structure"           : structure,
                 "ncores"              : ncores,
                 "system"              : system
 
@@ -263,9 +308,11 @@ if __name__ == "__main__":
 
         calculation_method = GapCalc
 
-        c = CalculationContainer(calculation_method, args )
+        c = CalculationContainer(calculation_method,  args )
 
         c.run()
+
+        print(c.method.result)
 
 
     if test == "Vasp":
@@ -304,6 +351,8 @@ if __name__ == "__main__":
 
         calculation_method = VaspCalc
 
-        c = CalculationContainer(calculation_method, args )
+        c = CalculationContainer(calculation_method,  args )
 
         c.run()
+
+        print(c.method.result)

@@ -29,7 +29,7 @@ class GAP_to_VASP(ProcessCalculation):
 
       self.structure = self.calc.args["structure"]
 
-      if self.calc.run_energy:
+      if self.calc.run_calculation:
           # Then extract the data
 
 
