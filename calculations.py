@@ -74,6 +74,7 @@ class CalculationUtils:
         result = {"calc_type" : calc_type}
 
         if calc_type == "energy":
+            print(structure)
             res =  structure.get_potential_energy()
 
 
