@@ -92,7 +92,7 @@ class VaspCalc( Calculation ):
         self.calc_utils = CalculationUtils()
         self.result = {}
 
-        self.structure = self.calc_utils.get_structure()
+        self.structure = self.calc_utils.get_structure(args)
 
 
     def setup(self):
@@ -159,7 +159,7 @@ class GapCalc( Calculation ):
         self.calc_utils = CalculationUtils()
         self.result = {}
 
-        self.structure = self.calc_utils.get_structure()
+        self.structure = self.calc_utils.get_structure(args)
 
     def setup(self):
         # Copy gap files from directory to where the calculation is
