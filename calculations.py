@@ -139,9 +139,34 @@ class GapCalc( Calculation ):
 
         return energy
 
+
+    def get_gap_potential_file(self, pot_file, subdir="gap_files"):
+        if self.utils.check_file('.', pot_file):
+            print(f"""
+            -->   Found GAP potential file {pot_file} in ./ directory    <--
+            """)
+        elif self.utils.check_file(subdir, pot_file):
+            print(f"""
+            -->   Found GAP potential file {pot_file} in {subdir} subdirectory    <--
+            """)
+            pot_file = f"{subdir}/{pot_file}"
+        else:
+            print(f"""
+                ####################################################################################################
+                ###---   FATAL: No {self.args["system"]}.xml file in directory or gap_files subdirectory.    ---###
+                ####################################################################################################
+                """)
+            exit(1)
+
+
+        gap = Potential(param_filename=pot_file)
+
+        return gap
+
     def get_energy_quip(self):
         if self.utils.check_key(self.args, "system"):
-            gap = Potential(param_filename=f'{self.args["system"]}.xml')
+            pot_file = self.utils.check_file_dir_subdir(f'{self.args["system"]}.xml')
+            gap = Potential(param_filename=pot_file)
         else:
             print(f"""
             ##############################################################################################

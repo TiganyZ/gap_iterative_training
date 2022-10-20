@@ -50,17 +50,42 @@ class Utils:
         files = os.listdir(src)
         for f in files:
             if os.path.isfile(f):
+                print(f"Utils.copy_only_files: copying {f}, {dst}")
                 shutil.copy(f, f"{dst}/")
 
 
+    def check_file_dir_subdir(self, file, subdir="gap_files"):
+        if self.check_file('.', file):
+            print(f"""
+            -->   Found file {file} in ./ directory    <--
+            """)
+        elif self.check_file(subdir, file):
+            print(f"""
+            -->   Found file {file} in {subdir} subdirectory    <--
+            """)
+            file = f"{subdir}/{file}"
+        else:
+            print(f"""
+                ###############################################################################
+                ###---   FATAL: No file {file} in directory or {subdir} subdirectory.    ---###
+                ###############################################################################
+                """)
+            exit(1)
 
-    def check_file(self, directory, file):
+        return file
+
+
+
+    def check_file(self, directory, file, stop=False):
         if not os.path.exists(f"{directory}/{file}"):
             print(f"""
             ################################################################
             ###---   WARNING! There is no path {directory}/{file} !   ---###
             ################################################################\n\n  --> Rectify this <--\n  I'm leaving you...""")
-            exit(1)
+            if stop:
+                exit(1)
+            else:
+                return False
         else:
             return True
 
