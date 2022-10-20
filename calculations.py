@@ -142,8 +142,10 @@ exitcode = os.system('srun -n {ncores} {binary}')
         self.utils.check_keys(self.args, keys=( "structure", "input_args" ) )
 
         self.structure.calc = Vasp( **self.args["input_args"] )
+        res =  self.structure.get_potential_energy()
 
-        self.result = self.calc_utils.run(self.structure, self.args)
+        print("VASP ENERGY RESULT: ", res)
+        self.result = {"result":res}#self.calc_utils.run(self.structure, self.args)
 
         return self.result
 
