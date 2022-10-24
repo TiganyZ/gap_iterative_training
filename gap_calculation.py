@@ -5,7 +5,7 @@ from ase.calculators.vasp import Vasp
 import os, shutil, subprocess
 from quippy.potential import Potential
 from utils import Utils
-from calculations import Calculation
+from calculations import Calculation, CalculationUtils, CalculationContainer
 
 
 class GapCalc( Calculation ):

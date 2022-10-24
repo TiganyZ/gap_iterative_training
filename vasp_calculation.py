@@ -4,8 +4,7 @@ from ase.io import read, write
 from ase.calculators.vasp import Vasp
 import os, shutil, subprocess
 from utils import Utils
-from calculations import Calculation
-
+from calculations import Calculation, CalculationUtils, CalculationContainer
 
 class VaspCalc( Calculation ):
 
