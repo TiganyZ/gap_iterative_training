@@ -16,8 +16,8 @@ class GapCalc( Calculation ):
         self.utils = Utils()
         self.calc_utils = CalculationUtils()
         self.result = {}
-
         self.structure = self.calc_utils.get_structure(args)
+
 
     def setup(self):
         # Copy gap files from directory to where the calculation is
@@ -68,9 +68,14 @@ class GapCalc( Calculation ):
 
 
     def setup_quip(self):
+        print(">>>   Setting up QUIP gap calculation <<<")
         if self.utils.check_key(self.args, "system"):
             pot_file = self.utils.check_file_dir_subdir(f'{self.args["system"]}.xml')
             gap = Potential(param_filename=pot_file)
+
+            self.structure.set_calculator(gap)
+            self.calc = gap
+
         else:
             print(f"""
             ##############################################################################################
@@ -78,9 +83,6 @@ class GapCalc( Calculation ):
             ##############################################################################################
             """)
             exit(1)
-        # Read the configurations
-        self.structure.set_calculator(gap)
-        self.calc = gap
 
 
     def setup_turbogap(self):
