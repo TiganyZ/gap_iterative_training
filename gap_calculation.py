@@ -77,7 +77,7 @@ class GapCalc( Calculation ):
 
             self.structure.set_calculator(gap)
             print(">>>   Assigning calculator <<<")
-            self.calc = self.structure.calc
+            self.calc = gap
 
         else:
             print(f"""
