@@ -79,8 +79,8 @@ class NEB_interface(Calculation):
             initial = self.images[ 0].structure
             final   = self.images[-1].structure
 
-            print(f"> Initial structure:\n > {initial.atoms}\n > {initial.cell}\n > {initial.symbols} ")
-            print(f"> Final   structure:\n > {final.atoms}\n > {final.cell}\n > {final.symbols} ")
+            print(f"> Initial structure:\n > {initial.positions}\n > {initial.cell}\n > {initial.symbols} ")
+            print(f"> Final   structure:\n > {final.positions}\n > {final.cell}\n > {final.symbols} ")
 
             if len(self.images) == 2:
                 print("""
