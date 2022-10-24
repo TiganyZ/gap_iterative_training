@@ -66,7 +66,7 @@ exitcode = os.system('srun -n {ncores} {binary}')
 
 
 
-    def calculate(self):
+    def run(self):
         # Create the input file for the directory and then compute
         # self.utils.check_keys(self.args, keys=( "structure", "input_args" ) )
 

@@ -18,7 +18,7 @@ class Calculation(ABC):
         pass
 
     @abstractmethod
-    def calculate():
+    def run():
         pass
 
     @abstractmethod
@@ -115,7 +115,7 @@ class CalculationContainer:
         self.utils.wrap_function("{self.method_name}.setup", self.method.setup, "setup")
         self.run_setup = True
 
-        self.utils.wrap_function(f"{self.method_name}.calculate", self.method.calculate, "calculating")
+        self.utils.wrap_function(f"{self.method_name}.run", self.method.run, "calculating")
         self.run_calculation = True
 
         self.method.result["method"] = self.method_name
