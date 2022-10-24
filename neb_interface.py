@@ -38,7 +38,7 @@ class NEB_interface(Calculation):
             os.chdir("../")
             self.calc_func = self.images[0].calc_func
             self.calc_args = self.images[0].calc_args
-            if hasattr(self.images[0], "calc_func") and hasattr(self.images[0],calc_args):
+            if hasattr(self.images[0], "calc_func") and hasattr(self.images[0],"calc_args"):
                 print(f">>> SUCCESS: got the calculator successfully <<<\n >>> calc_func= {self.images[0].calc_func}\n >>> calc_args= {self.images[0].calc_args}")
             else:
                 print("""
