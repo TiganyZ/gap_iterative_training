@@ -111,7 +111,7 @@ class NEB_interface(Calculation):
 
 
 
-if __name__ == "__Main__":
+if __name__ == "__main__":
 
 
     test = "Vasp"
