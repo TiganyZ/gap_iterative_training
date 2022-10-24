@@ -111,11 +111,12 @@ class CalculationContainer:
 
     def run(self):
 
-        self.method.setup()
+        self.utils.wrap_function("{self.method_name}.setup", self.method.setup, "setup")
         self.run_setup = True
 
-        self.method.calculate()
+        self.utils.wrap_function("{self.method_name}.calculate", self.method.calculate, "calculating")
         self.run_calculation = True
+
         self.method.result["method"] = self.method_name
 
         self.method.get_data()

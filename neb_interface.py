@@ -106,6 +106,10 @@ class NEB_interface(Calculation):
                 self.neb = NEB(self.neb_images, climb=self.climb)
 
 
+    def get_data(self):
+        pass
+
+
 
 if __name__ == "__Main__":
 
@@ -159,4 +163,5 @@ if __name__ == "__Main__":
                     "output_directory"    : output_directory
                     }
 
-        n = NEB_interface( neb_args )
+        n = CalculationContainer(NEB_interface, neb_args )
+        n.run()

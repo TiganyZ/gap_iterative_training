@@ -237,22 +237,14 @@ e0 = {self.e0}
 """)
 
 
-    def wrap_function(self, function, message):
-        print(f"> Train.setup:          {message} ")
-        function()
-        print(f"> Train.setup: SUCCESS: {message} \n")
-
-        return
-
-
 
 
     def setup(self):
 
-        self.wrap_function( self.create_dbs,      "Creating database")
-        self.wrap_function( self.add_tags,        "Adding tags")
-        self.wrap_function( self.make_gap_files,  "Converting gap_fit to turbogap")
-        self.wrap_function( self.create_train_sh, "Creating train.sh file")
+        self.utils.wrap_function( "Train.setup", self.create_dbs,      "Creating database")
+        self.utils.wrap_function( "Train.setup", self.add_tags,        "Adding tags")
+        self.utils.wrap_function( "Train.setup", self.make_gap_files,  "Converting gap_fit to turbogap")
+        self.utils.wrap_function( "Train.setup", self.create_train_sh, "Creating train.sh file")
 
 
 

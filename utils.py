@@ -5,6 +5,15 @@ from glob import glob
 
 class Utils:
 
+
+    def wrap_function(self, function, message):
+        print(f"> {prefix}:          {message} ")
+        function()
+        print(f"> {prefix}: SUCCESS: {message} \n")
+
+        return True
+
+
     def check_key(self, dic, key):
         ret = False
         if key in dic.keys():
