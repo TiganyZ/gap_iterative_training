@@ -142,7 +142,6 @@ class VaspCalc( Calculation ):
 
 
 
-
         print(self.structure.calc)
         res =  self.structure.get_potential_energy()
 
