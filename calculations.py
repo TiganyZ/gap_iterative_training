@@ -111,7 +111,7 @@ class CalculationContainer:
     def run(self):
 
         print("about to wreap", (f"{self.method_name}.setup", self.method.setup, "setup"))
-        self.method.utils.wrap_function("{self.method_name}.setup", self.method.setup, "setup")
+        self.method.utils.wrap_function(f"{self.method_name}.setup", self.method.setup, "setup")
         self.run_setup = True
 
         self.method.utils.wrap_function(f"{self.method_name}.run", self.method.run, "calculating")

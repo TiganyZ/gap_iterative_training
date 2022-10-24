@@ -94,12 +94,6 @@ class NEB_interface(Calculation):
 
                 if self.utils.check_key(self.args, "n_images"):
                     self.neb_images = [initial.copy() for _ in range(self.args["n_images"] -1)] + [final]
-                    for n in self.neb_images:
-                        n.set_calculator(self.calc)
-
-                    print(f"> NEB Images ", self.neb_images)
-                    self.neb = NEB(self.neb_images, climb=self.climb)
-                    self.neb.interpolate()
                 else:
                     print("""
                     #####################################################################################################
@@ -110,8 +104,18 @@ class NEB_interface(Calculation):
             else:
                 # Get the neb images from the images object
                 self.neb_images = [ image.structure for image in self.images ]
-                self.neb_images = [n.set_calculator(self.calc) for n in self.neb_images]
-                self.neb = NEB(self.neb_images, climb=self.climb)
+
+            for n in self.neb_images:
+                n.calc = self.calc
+                print(n.calc)
+
+            print(f"> NEB Images ", self.neb_images)
+            self.neb = NEB(self.neb_images, climb=self.climb)
+
+            if len(self.images) == 2:
+                self.neb.interpolate()
+
+            print(self.neb)
 
 
     def get_data(self):
