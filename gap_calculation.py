@@ -55,15 +55,20 @@ class GapCalc( Calculation ):
 
 
 
-    def run(self):
-        # Create the input file for the directory and then compute
-        self.utils.check_keys(self.args, keys=( "structure", "input_args" ) )
-
-        if self.utils.check_key(self.args["input_args"], "quip"):
-            self.setup_quip()
+        if self.utils.check_key(self.args, "input_args"):
+            if self.utils.check_key(self.args["input_args"], "quip"):
+                self.setup_quip()
+            else:
+                self.setup_turbogap()
         else:
             self.setup_turbogap()
 
+
+
+
+
+    def run(self):
+        # Create the input file for the directory and then compute
         self.result = self.calc_utils.run(self.structure, self.args)
 
         return self.result
