@@ -152,7 +152,7 @@ if __name__ == "__main__":
 
         c1 = CalculationContainer(calculation_method,  args )
 
-        args2 = copy(args)
+        args2 = copy.copy(args)
         args2["structure"] = fstructure
         c2 = CalculationContainer(calculation_method,  args2 )
 
