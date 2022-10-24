@@ -5,7 +5,6 @@ from glob import glob
 
 class Utils:
 
-
     def wrap_function(self, function, message):
         print(f"> {prefix}:          {message} ")
         function()
