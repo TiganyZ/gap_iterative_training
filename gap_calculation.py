@@ -21,6 +21,8 @@ class GapCalc( Calculation ):
 
     def setup(self):
         # Copy gap files from directory to where the calculation is
+
+        print(f">>> Arguments for setup of {self.name}: {self.args}")
         self.utils.check_keys(self.args)
 
         pot_dir = self.args["potential_directory"]
