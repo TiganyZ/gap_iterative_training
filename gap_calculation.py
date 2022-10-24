@@ -82,7 +82,8 @@ class GapCalc( Calculation ):
 
             self.structure.set_calculator(gap)
             print(">>>   Assigning calculator <<<")
-            self.calc = gap
+            self.calc_func = Potential
+            self.calc_args = {"param_filename":pot_file}
 
         else:
             print(f"""

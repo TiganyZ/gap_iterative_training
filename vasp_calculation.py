@@ -37,7 +37,8 @@ class VaspCalc( Calculation ):
         self.utils.check_keys(self.args, keys=( "structure", "input_args" ) )
 
         self.structure.calc = Vasp( **self.args["input_args"] )
-        self.calc = Vasp( **self.args["input_args"] )
+        self.calc_func = Vasp
+        self.calc_args = input_args
 
 
         self.cwd = os.getcwd()

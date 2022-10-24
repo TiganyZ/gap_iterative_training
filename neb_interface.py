@@ -24,8 +24,9 @@ class NEB_interface(Calculation):
 
 
     def get_calc(self):
-        if self.utils.check_key(self.args, "calc"):
-            self.calc = self.args["calc"]
+        if self.utils.check_key(self.args, "calc_func") and self.utils.check_key(self.args, "calc_args"):
+            self.calc_func = self.args["calc_func"]
+            self.calc_args = self.args["calc_args"]
         else:
             print("""
             ###############################################################################
@@ -35,11 +36,10 @@ class NEB_interface(Calculation):
 
             self.images[0].setup()
             os.chdir("../")
-            self.calc = self.images[0].calc
-            print(self.calc, self.images[0].structure.calc, self.images[0])
-            #            print("> get energy: ", self.images[0].structure.get_potential_energy())
-            if hasattr(self.images[0], "calc"):
-                print(f">>> SUCCESS: got the calculator successfully <<<\n >>> Calc = {self.images[0].structure.calc}")
+            self.calc_func = self.images[0].calc_func
+            self.calc_args = self.images[0].calc_args
+            if hasattr(self.images[0], "calc_func") and hasattr(self.images[0],calc_args):
+                print(f">>> SUCCESS: got the calculator successfully <<<\n >>> calc_func= {self.images[0].calc_func}\n >>> calc_args= {self.images[0].calc_args}")
             else:
                 print("""
             ######################################################################################
@@ -108,8 +108,7 @@ class NEB_interface(Calculation):
 
 
             for n in self.neb_images:
-                n.set_calculator( self.calc )
-                print(n.calc, self.calc)
+                n.calc =  self.calc_func( **self.calc_args )
 
             print(f"> NEB Images ", self.neb_images)
             self.neb = NEB(self.neb_images, climb=self.climb)
