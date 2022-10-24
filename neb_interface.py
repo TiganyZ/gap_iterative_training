@@ -37,7 +37,7 @@ class NEB_interface(Calculation):
             os.chdir("../")
             self.calc = self.images[0].structure.calc
 
-            if hasattr(self.images[0], "calc"):
+            if hasattr(self.images[0].structure, "calc"):
                 print(">>> SUCCESS: got the calculator successfully <<<")
             else:
                 print("""
