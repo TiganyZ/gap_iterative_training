@@ -38,7 +38,7 @@ class NEB_interface(Calculation):
             self.calc = self.images[0].structure.calc
 
             if hasattr(self.images[0].structure, "calc"):
-                print(">>> SUCCESS: got the calculator successfully <<<")
+                print(f">>> SUCCESS: got the calculator successfully <<<\n >>> Calc = {self.images[0].structure.calc}")
             else:
                 print("""
             ######################################################################################
@@ -105,9 +105,10 @@ class NEB_interface(Calculation):
                 # Get the neb images from the images object
                 self.neb_images = [ image.structure for image in self.images ]
 
+
             for n in self.neb_images:
-                n.calc = self.calc
-                print(n.calc)
+                n.set_calculator( self.calc )
+                print(n.calc, self.calc)
 
             print(f"> NEB Images ", self.neb_images)
             self.neb = NEB(self.neb_images, climb=self.climb)
