@@ -85,7 +85,6 @@ class CalculationContainer:
     def __init__(self, calculation_method: Type[Calculation], args):
 
         self.args = args
-
         self.method = calculation_method(self.args)
         self.method_name = self.method.name
 
@@ -112,10 +111,10 @@ class CalculationContainer:
     def run(self):
 
         print("about to wreap", (f"{self.method_name}.setup", self.method.setup, "setup"))
-        self.utils.wrap_function("{self.method_name}.setup", self.method.setup, "setup")
+        self.method.utils.wrap_function("{self.method_name}.setup", self.method.setup, "setup")
         self.run_setup = True
 
-        self.utils.wrap_function(f"{self.method_name}.run", self.method.run, "calculating")
+        self.method.utils.wrap_function(f"{self.method_name}.run", self.method.run, "calculating")
         self.run_calculation = True
 
         self.method.result["method"] = self.method_name
