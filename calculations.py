@@ -7,12 +7,11 @@ from ase import Atoms
 from ase.io import read, write
 from ase.calculators.vasp import Vasp
 import os, shutil, subprocess
+# from quippy.potential import Potential as QuippyPotential
 import quippy
-from quippy.potential import Potential
 
 from utils import Utils
 # from process_calculation import GAP_to_VASP, VASP_to_GAP
-
 
 
 class Calculation(ABC):
@@ -118,20 +117,16 @@ class VaspCalc( Calculation ):
 
 
     def create_run_environment(self):
-        self.utils.check_keys(self.args, keys=( "ncores", "binary" ) )
+        self.utils.check_keys(self.args, keys=( "ncores", "binary", "driver_args" ) )
+        self.args["driver_args"]["ncores"] = self.args["binary"]
+        self.args["driver_args"]["binary"] = self.args["ncores"]
 
-        binary = self.args["binary"]
-        ncores = self.args["ncores"]
-        # Make the run_vasp for the number of cores that we want
-        with open("run_vasp.py", 'w') as f:
-            f.write(f"""
-import os
-exitcode = os.system('srun -n {ncores} {binary}')
-""")
+        driver_template = self.utils.get_driver_template(self.args["driver_args"])
 
-        cwd = os.getcwd()
+        with open("vasp_driver.sh", 'w') as f:
+            f.write(driver_template)
 
-        os.environ["VASP_SCRIPT"]=f"run_vasp.py"
+        os.chmod("vasp_driver.sh", 0o777)
 
 
 
@@ -142,6 +137,12 @@ exitcode = os.system('srun -n {ncores} {binary}')
         self.utils.check_keys(self.args, keys=( "structure", "input_args" ) )
 
         self.structure.calc = Vasp( **self.args["input_args"] )
+
+        # Write the new INCAR file
+
+
+
+
         print(self.structure.calc)
         res =  self.structure.get_potential_energy()
 
@@ -341,8 +342,20 @@ if __name__ == "__main__":
                             "lcharg" : False,
                             "ncore" : 16,
                             "kpar" : 4
-                           #                            "txt": "OUTCAR_test"
         }
+
+        driver_args =  {"job-name": "vasp_quip",
+                        "account": "project_2006384",
+                        "queue" : "medium",
+                        "ntasks-per-node": 128,
+                        "nodes": 1,
+                        "walltime": "0-00:10:00",
+                        "output": "out_vasp_quip",
+                        "modules": ["vasp/6.3.0"],
+                        "export_paths": ["VASP_PP_PATH=/projappl/project_2006384/vasp/potentials"],
+                        "command": "srun"}
+
+
 
 
         args ={ "binary"              : binary,
@@ -351,7 +364,8 @@ if __name__ == "__main__":
                 "output_directory"    : output_directory,
                 "structure"           : structure,
                 "input_args"          : vasp_input_args,
-                "ncores"              : ncores
+                "ncores"              : ncores,
+                "driver_args"         : driver_args
 
         }
 
