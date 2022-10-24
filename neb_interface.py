@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-from ase import Atoms,
+from ase import Atoms
 from ase.io import read, write
 from ase.calculators.vasp import Vasp
 from ase.neb import NEB
