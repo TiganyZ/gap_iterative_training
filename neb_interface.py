@@ -13,8 +13,8 @@ class NEB_interface(Calculation):
     def __init__(self, neb_args):
 
         self.name = "NebCalc"
-        self.images = self.neb_args["images"]
         self.neb_args = neb_args
+        self.images = neb_args["images"]
         self.utils = Utils()
 
         if self.utils.check_key(neb_args, "climb"):
