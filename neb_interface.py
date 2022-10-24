@@ -91,9 +91,11 @@ class NEB_interface(Calculation):
 
 
                 if self.utils.check_key(self.neb_args, "n_images"):
-                    self.neb_images = [initial.copy() for i in range(self.neb_args["n_images"] -1)] + [final]
-                    self.neb_images = [n.set_calculator(self.calc) for n in self.neb_images]
+                    self.neb_images = [initial.copy() for _ in range(self.neb_args["n_images"] -1)] + [final]
+                    for n in self.neb_images:
+                        n.set_calculator(self.calc)
 
+                    print(f"> NEB Images ", self.neb_images)
                     self.neb = NEB(self.neb_images, climb=self.climb)
                     self.neb.interpolate()
                 else:
