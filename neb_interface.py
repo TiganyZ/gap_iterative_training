@@ -24,8 +24,8 @@ class NEB_interface(Calculation):
 
 
     def get_calc(self):
-        if hasattr(self.images[0].structure, "calc"):
-            self.calc = self.images[0].structure.calc
+        if self.utils.check_key(self.args, "calc"):
+            self.calc = self.args["calc"]
         else:
             print("""
             ###############################################################################
@@ -35,6 +35,8 @@ class NEB_interface(Calculation):
 
             self.images[0].setup()
             os.chdir("../")
+            self.calc = self.images[0].structure.calc
+
             if hasattr(images[0].structure, "calc"):
                 print(">>> SUCCESS: got the calculator successfully <<<")
             else:
