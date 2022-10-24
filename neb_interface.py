@@ -10,15 +10,15 @@ from utils import Utils
 from calculations import Calculation, CalculationUtils, CalculationContainer
 
 class NEB_interface(Calculation):
-    def __init__(self, neb_args):
+    def __init__(self, args):
 
         self.name = "NebCalc"
-        self.neb_args = neb_args
-        self.images = neb_args["images"]
+        self.args = args
+        self.images = args["images"]
         self.utils = Utils()
 
-        if self.utils.check_key(neb_args, "climb"):
-            self.climb = self.neb_args["climb"]
+        if self.utils.check_key(args, "climb"):
+            self.climb = self.args["climb"]
         else:
             self.climb = False
 
@@ -69,10 +69,10 @@ class NEB_interface(Calculation):
 
         self.get_calc()
 
-        if self.utils.check_key(self.neb_args, "read_traj"):
+        if self.utils.check_key(self.args, "read_traj"):
             # Read from the trajectory fild
-            n_images = self.neb_args["n_images"]
-            traj_file = self.neb_args["read_traj"]
+            n_images = self.args["n_images"]
+            traj_file = self.args["read_traj"]
             self.neb_images = read(f'{traj_file}@-{n_images}:')
             self.neb = NEB(self.neb_images, climb=self.climb)
         else:
@@ -90,8 +90,8 @@ class NEB_interface(Calculation):
                 """)
 
 
-                if self.utils.check_key(self.neb_args, "n_images"):
-                    self.neb_images = [initial.copy() for _ in range(self.neb_args["n_images"] -1)] + [final]
+                if self.utils.check_key(self.args, "n_images"):
+                    self.neb_images = [initial.copy() for _ in range(self.args["n_images"] -1)] + [final]
                     for n in self.neb_images:
                         n.set_calculator(self.calc)
 
