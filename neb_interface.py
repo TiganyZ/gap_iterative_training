@@ -35,7 +35,6 @@ class NEB_interface(Calculation):
             """)
 
             self.images[0].setup()
-            os.chdir("../")
             self.calc_func = self.images[0].calc_func
             self.calc_args = self.images[0].calc_args
             if hasattr(self.images[0], "calc_func") and hasattr(self.images[0],"calc_args"):
@@ -58,6 +57,8 @@ class NEB_interface(Calculation):
 
         if not os.path.exists( out_dir):
             os.mkdir(out_dir )
+
+
 
         self.cwd = os.getcwd()
         os.chdir(out_dir)
