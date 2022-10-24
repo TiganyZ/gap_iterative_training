@@ -208,15 +208,15 @@ virial="virial"
 
 
 gap_fit atoms_filename=train_tagged.xyz \
-        gap = { {gap_2b_terms}
-            soap_turbo l_max={self.info['l_max']} alpha_max={{{self.info['n_max'][0]} {self.info['n_max'][1]}}} atom_sigma_r={{0.5 0.5}} atom_sigma_t={{0.5 0.5}} \
-                    atom_sigma_r_scaling={{0. 0.}} atom_sigma_t_scaling={{0. 0.}} zeta=4 rcut_soft=5.0 rcut_hard=5.5 \
-                    basis=poly3gauss scaling_mode=polynomial amplitude_scaling={{1.0 1.0}} n_species=2 \
-                    species_Z={{{self.numbers[1]} {self.numbers[0]}}} radial_enhancement={{1}} compress_file=compress.dat central_index={central_index} \
-                    central_weight={{1.0 1.0}} add_species=F \
+        gap = {{ {gap_2b_terms}
+            soap_turbo l_max={self.info['l_max']} alpha_max={{{self.info['n_max'][0]} {self.info['n_max'][1]}}} atom_sigma_r={{{0.5 0.5}}} atom_sigma_t={{{0.5 0.5}}} \
+                    atom_sigma_r_scaling={{{0. 0.}}} atom_sigma_t_scaling={{{0. 0.}}} zeta=4 rcut_soft=5.0 rcut_hard=5.5 \
+                    basis=poly3gauss scaling_mode=polynomial amplitude_scaling={{{1.0 1.0}}} n_species=2 \
+                    species_Z={{{self.numbers[1]} {self.numbers[0]}}} radial_enhancement={{{1}}} compress_file=compress.dat central_index={central_index} \
+                    central_weight={{{1.0 1.0}}} add_species=F \
                     config_type_n_sparse={self.config_dict} \
-                    delta=0.1 f0=0.0 covariance_type=dot_product sparse_method=cur_points } \
-                 default_sigma={0.001 0.1 0.1 0.1} energy_parameter_name=$energy force_parameter_name=$forces \
+                    delta=0.1 f0=0.0 covariance_type=dot_product sparse_method=cur_points }} \
+                 default_sigma={{0.001 0.1 0.1 0.1}} energy_parameter_name=$energy force_parameter_name=$forces \
                  force_mask_parameter_name=force_mask virial_parameter_name=$virial sparse_jitter=1.0e-8 do_copy_at_file=F \
                  sparse_separate_file=T gp_file={self.system}.xml openmp_chunk_size=100 e0={e0}
             """)
@@ -254,7 +254,7 @@ e0 = {self.e0}
         self.wrap_function( self.make_gap_files,  "Converting gap_fit to turbogap")
         self.wrap_function( self.create_train_sh, "Creating train.sh file")
 
-        return
+
 
 
     def create_workflow(self, args):
@@ -297,3 +297,6 @@ if __name__ == "__main__":
             "n_max" : [8, 8]
 
             }
+
+
+    t = Train( system, outcars, info )

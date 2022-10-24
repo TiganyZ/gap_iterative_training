@@ -6,6 +6,7 @@ import os, shutil, subprocess
 from utils import Utils
 from calculations import Calculation, CalculationUtils, CalculationContainer
 
+
 class VaspCalc( Calculation ):
 
     def __init__(self, args):
@@ -32,6 +33,12 @@ class VaspCalc( Calculation ):
         # self.utils.check_copy_file(input_dir, "INCAR", out_dir)
 
         shutil.copytree( f"{input_dir}/", f"{out_dir}/" )
+
+        self.utils.check_keys(self.args, keys=( "structure", "input_args" ) )
+
+        self.structure.calc = Vasp( **self.args["input_args"] )
+        self.calc = Vasp( **self.args["input_args"] )
+
 
         self.cwd = os.getcwd()
         os.chdir( out_dir )
@@ -61,14 +68,16 @@ exitcode = os.system('srun -n {ncores} {binary}')
 
     def calculate(self):
         # Create the input file for the directory and then compute
-        self.utils.check_keys(self.args, keys=( "structure", "input_args" ) )
+        # self.utils.check_keys(self.args, keys=( "structure", "input_args" ) )
 
-        self.structure.calc = Vasp( **self.args["input_args"] )
-        print(self.structure.calc)
-        res =  self.structure.get_potential_energy()
+        # self.structure.calc = Vasp( **self.args["input_args"] )
+        # self.calc = Vasp( **self.args["input_args"] )
 
-        print("VASP ENERGY RESULT: ", res)
-        self.result = {"result":res}#self.calc_utils.run(self.structure, self.args)
+        # print(self.structure.calc)
+        self.result = self.calc_utils.run(self.structure, self.args)
+
+        # print("VASP ENERGY RESULT: ", self.result)
+        # self.result = {"result":self.result}#self.calc_utils.run(self.structure, self.args)
 
         return self.result
 

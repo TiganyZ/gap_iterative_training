@@ -48,7 +48,6 @@ class GapCalc( Calculation ):
             self.utils.copy_only_files(pot_dir, f'{out_dir}/gap_files')
 
 
-
         self.cwd = os.getcwd()
         os.chdir( out_dir )
 
@@ -81,6 +80,8 @@ class GapCalc( Calculation ):
             exit(1)
         # Read the configurations
         self.structure.set_calculator(gap)
+        self.calc = gap
+
 
     def setup_turbogap(self):
         pass
