@@ -35,9 +35,10 @@ class NEB_interface(Calculation):
 
             self.images[0].setup()
             os.chdir("../")
-            self.calc = self.images[0].structure.calc
-
-            if hasattr(self.images[0].structure, "calc"):
+            self.calc = self.images[0].calc
+            print(self.calc, self.images[0].structure.calc, self.images[0])
+            print("> get energy: ", self.images[0].get_potential_energy())
+            if hasattr(self.images[0], "calc"):
                 print(f">>> SUCCESS: got the calculator successfully <<<\n >>> Calc = {self.images[0].structure.calc}")
             else:
                 print("""
