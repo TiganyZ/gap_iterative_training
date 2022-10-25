@@ -18,6 +18,11 @@ class VaspCalc( Calculation ):
 
         self.structure = self.calc_utils.get_structure(args)
 
+        if self.utils.check_key(args, "make_dirs"):
+            self.make_dirs = self.args["make_dirs"]
+        else:
+            self.make_dirs = True
+
 
     def setup(self):
         # Copy gap files from directory to where the calculation is
@@ -25,20 +30,21 @@ class VaspCalc( Calculation ):
         self.utils.check_keys(self.args)
         out_dir = self.args["output_directory"]
         pot_dir = self.args["potential_directory"]
-
-        self.path = os.path.abspath(out_dir)
-        self.utils.check_copy_file(pot_dir, "POTCAR", out_dir)
         self.pot_path = os.path.abspath(f"{pot_dir}/POTCAR" )
 
 
+        if self.make_dirs:
+            self.copy_potential(pot_dir, "POTCAR", out_dir)
+            self.path = os.path.abspath(out_dir)
+        else:
+            self.path = os.path.abspath("./")
 
         self.utils.check_keys(self.args, keys=( "structure", "input_args" ) )
 
-        self.args["input_args"]["directory"] = out_dir
+        self.args["input_args"]["directory"] = self.path
         self.structure.calc = Vasp( **self.args["input_args"] )
         self.calc_func = Vasp
         self.calc_args = self.args["input_args"]
-
 
         self.create_run_environment(out_dir)
 
@@ -47,7 +53,6 @@ class VaspCalc( Calculation ):
         self.utils.check_keys(self.args)
         out_dir = self.args["output_directory"]
         pot_dir = self.args["potential_directory"]
-
         self.utils.check_copy_file(pot_dir, "POTCAR", dir)
 
     def create_run_environment(self, out_dir):
@@ -93,6 +98,13 @@ exitcode = os.system('srun -n {ncores} {binary}')
         # self.result = {"result":self.result}#self.calc_utils.run(self.structure, self.args)
 
         return self.result
+
+
+
+    def save(self):
+        name = self.utils.get_save_name(self.path, self.result)
+        self.structure.calc.write_json(name)
+
 
 
     def get_data(self):

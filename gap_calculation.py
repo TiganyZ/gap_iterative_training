@@ -19,16 +19,21 @@ class GapCalc( Calculation ):
         self.structure = self.calc_utils.get_structure(args)
 
 
+        if self.utils.check_key(args, "make_dirs"):
+            self.make_dirs = self.args["make_dirs"]
+        else:
+            self.make_dirs = True
+
+
     def find_potential_file(self, directory):
         # First check this current directory
-
         pot_file = self.utils.check_file_dir_subdir(f'{self.args["system"]}.xml', dir='.', subdir="gap_files")
 
         if pot_file is None:
             pot_file = self.utils.check_file_dir_subdir(f'{self.args["system"]}.xml', dir=directory, subdir="gap_files")
 
         if pot_file is None:
-            print("""
+            print(f"""
             ###################################################################################################################################################
             ###---   FATAL: Could not find the potential file {self.args['system']}.xml in ./ or ./gap_files or {directory} or {directory}/gap_files   ---###
             ###################################################################################################################################################
@@ -82,3 +87,12 @@ class GapCalc( Calculation ):
 
     def get_data(self):
         pass
+
+    def save(self):
+        # Write the json file
+        from ase.io import jsonio
+        dct = self.structure.calc.results  # Get the calculator in a dictionary format
+        dct_extra = self.structure.calc.extra_results  # Get the calculator in a dictionary format
+        name = self.utils.get_save_name(self.path, self.result)
+        jsonio.write_json(name, dct)
+        jsonio.write_json(name.replace( ".json", "_extra,json" ), dct_extra)

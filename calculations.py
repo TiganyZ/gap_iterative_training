@@ -22,6 +22,10 @@ class Calculation(ABC):
         pass
 
     @abstractmethod
+    def save():
+        pass
+
+    @abstractmethod
     def get_data():
         pass
 
@@ -122,6 +126,9 @@ class CalculationContainer:
 
         self.method.utils.wrap_function(f"{self.method_name}.run", self.method.run, "calculating")
         self.run_calculation = True
+
+        self.method.utils.wrap_function(f"{self.method_name}.save", self.method.save, "saving")
+        self.saved_calculation = True
 
         self.method.result["method"] = self.method_name
 

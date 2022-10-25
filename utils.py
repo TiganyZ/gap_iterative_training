@@ -191,3 +191,15 @@ class Utils:
 
         elif verbosity > 50:
             print(f"CHECK_SUBPROCESS: {out}")
+
+
+    def get_save_name(self, path, result):
+        l = os.listdir(path)
+
+        name = '_'.join( list(result.keys()) )
+        suffix=''
+        counter = 0
+        while name+suffix+".json" in l:
+            suffix = f"_{counter:d}"
+
+        return name+suffix+".json"

@@ -134,6 +134,12 @@ class NEB_interface(Calculation):
     def get_data(self):
         pass
 
+    def save(self):
+
+        images = self.neb.images
+
+        for i in images:
+            images.save()
 
 
 if __name__ == "__main__":
