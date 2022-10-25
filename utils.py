@@ -141,7 +141,7 @@ set -xe
                 ###---   FATAL: No file {file} in directory or {subdir} subdirectory.    ---###
                 ###############################################################################
                 """)
-            exit(1)
+            return None
 
         return file
 

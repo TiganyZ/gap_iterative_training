@@ -94,7 +94,13 @@ class CalculationContainer:
         if not "output_directory"  in args.keys():
             output_directory = self.create_output_directory()
             self.method.args["output_directory"] = output_directory
+        out_dir = args["output_directory"]
+        input_dir = args["input_directory"]
 
+        self.utils = Utils()
+        self.utils.check_copy_tree(input_dir, out_dir)
+
+        self.path = os.path.abspath(out_dir)
 
         self.run_setup = False
         self.run_calculation = False

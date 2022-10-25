@@ -19,26 +19,19 @@ class VaspCalc( Calculation ):
         self.structure = self.calc_utils.get_structure(args)
 
 
-    def setup(self):
+    def setup(self, directory):
         # Copy gap files from directory to where the calculation is
-        self.utils.check_keys(self.args)
-
-        pot_dir = self.args["potential_directory"]
-        out_dir = self.args["output_directory"]
-        input_dir = self.args["input_directory"]
 
 
         self.path = os.path.abspath(out_dir)
         self.utils.check_copy_file(pot_dir, "POTCAR", out_dir)
         self.pot_path = os.path.abspath(f"{pot_dir}/POTCAR" )
 
-        # Will create INCAR later
-        # self.utils.check_copy_file(input_dir, "INCAR", out_dir)
 
-        shutil.copytree( f"{input_dir}/", f"{out_dir}/" )
 
         self.utils.check_keys(self.args, keys=( "structure", "input_args" ) )
 
+        self.args["input_args"]["directory"] = out_dir
         self.structure.calc = Vasp( **self.args["input_args"] )
         self.calc_func = Vasp
         self.calc_args = input_args
@@ -47,10 +40,10 @@ class VaspCalc( Calculation ):
         self.cwd = os.getcwd()
         os.chdir( out_dir )
 
-        self.create_run_environment()
+        self.create_run_environment(out_dir)
 
 
-    def create_run_environment(self):
+    def create_run_environment(self, out_dir):
         self.utils.check_keys(self.args, keys=( "ncores", "binary" ) )
         self.utils.check_keys(self.args, keys=( "ncores", "binary", "driver_args" ) )
         self.args["driver_args"]["ncores"] = self.args["binary"]
@@ -61,7 +54,7 @@ class VaspCalc( Calculation ):
         binary = self.args["binary"]
         ncores = self.args["ncores"]
         # Make the run_vasp for the number of cores that we want
-        with open("run_vasp.py", 'w') as f:
+        with open(f"{out_dir}/run_vasp.py", 'w') as f:
             f.write(f"""
 import os
 exitcode = os.system('srun -n {ncores} {binary}')
@@ -69,7 +62,7 @@ exitcode = os.system('srun -n {ncores} {binary}')
 
         cwd = os.getcwd()
 
-        os.environ["VASP_SCRIPT"]=f"run_vasp.py"
+        os.environ["VASP_SCRIPT"]=os.path.abspath(f"{out_dir}/run_vasp.py")
 
 
 

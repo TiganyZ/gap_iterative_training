@@ -19,51 +19,38 @@ class GapCalc( Calculation ):
         self.structure = self.calc_utils.get_structure(args)
 
 
+    def find_potential_file(self, directory):
+        # First check this current directory
+
+        pot_file = self.utils.check_file_dir_subdir(f'{self.args["system"]}.xml', subdir="gap_files")
+
+        if pot_file is None:
+            pot_file = self.utils.check_file_dir_subdir(f'{directory}/{self.args["system"]}.xml', subdir="gap_files")
+
+        if pot_file is None:
+            print("""
+            ###################################################################################################################################################
+            ###---   FATAL: Could not find the potential file {self.args['system']}.xml in ./ or ./gap_files or {directory} or {directory}/gap_files   ---###
+            ###################################################################################################################################################
+
+            """)
+            exit(1)
+        else:
+            return os.path.abspath(pot_file)
+
 
     def setup(self):
         # Copy gap files from directory to where the calculation is
-        print(f">>> Arguments for setup of {self.name}: {self.args}")
-        self.utils.check_keys(self.args)
 
-        pot_dir = self.args["potential_directory"]
         out_dir = self.args["output_directory"]
-        input_dir = self.args["input_directory"]
-
-        # self.utils.check_copy_file(input_dir, "input", out_dir)
-
-        self.utils.check_copy_tree(input_dir, out_dir)
-        self.path = os.path.abspath(out_dir)
-
-
-        if f"{input_dir}" == f"{pot_dir}":
-            print("""
-            ########################################################################################################
-            ###---   WARNING: Input dir is the same as the potential dir for the gap calculation. Not copying.---###
-            ###---            Usually this path should be a gap_files directory                               ---###
-            ########################################################################################################
-
-            """)
-        if self.utils.check_key(self.args["input_args"], "quip"):
-            # Copy all the xml files to the directory from the potential directory
-            self.utils.copy_only_files(pot_dir, out_dir)
-        else:
-            if not os.path.exists(f'{out_dir}/gap_files'):
-                os.mkdir(f'{out_dir}/gap_files')
-            self.utils.copy_only_files(pot_dir, f'{out_dir}/gap_files')
-
-        self.cwd = os.getcwd()
-        os.chdir( out_dir )
-
-
+        pot_file = self.find_potential_file(out_dir)
         if self.utils.check_key(self.args, "input_args"):
             if self.utils.check_key(self.args["input_args"], "quip"):
-                self.setup_quip()
+                self.setup_quip(pot_file, out_dir)
             else:
                 self.setup_turbogap()
         else:
             self.setup_turbogap()
-
-
 
 
 
@@ -74,26 +61,14 @@ class GapCalc( Calculation ):
         return self.result
 
 
-    def setup_quip(self):
+    def setup_quip(self, pot_file, out_dir):
         print(">>>   Setting up QUIP gap calculation <<<")
-        if self.utils.check_key(self.args, "system"):
-            pot_file = self.utils.check_file_dir_subdir(f'{self.args["system"]}.xml')
-            gap = Potential(param_filename=pot_file)
-            self.pot_path = os.path.abspath(pot_file)
+        gap = Potential(param_filename=pot_file, directory = out_dir)
+        self.structure.set_calculator(gap)
+        print(">>>   Assigning calculator <<<")
+        self.calc_func = Potential
+        self.calc_args = {"param_filename":self.pot_path, "directory" : out_dir}
 
-            self.structure.set_calculator(gap)
-            print(">>>   Assigning calculator <<<")
-            self.calc_func = Potential
-            self.calc_args = {"param_filename":self.pot_path}
-
-
-        else:
-            print(f"""
-            ##############################################################################################
-            ###---   WARNING: There is no system specified for this GAP calculation. Rectify this   ---###
-            ##############################################################################################
-            """)
-            exit(1)
 
 
     def setup_turbogap(self):

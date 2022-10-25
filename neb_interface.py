@@ -107,6 +107,7 @@ class NEB_interface(Calculation):
 
 
             for i,n in enumerate(self.neb_images):
+                self.calc_args["directory"] = f"{i:02d}"
                 n.calc =  self.calc_func( **self.calc_args )
 
             print(f"> NEB Images ", self.neb_images)
