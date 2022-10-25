@@ -19,7 +19,7 @@ class VaspCalc( Calculation ):
         self.structure = self.calc_utils.get_structure(args)
 
 
-    def setup(self, directory):
+    def setup(self):
         # Copy gap files from directory to where the calculation is
 
 

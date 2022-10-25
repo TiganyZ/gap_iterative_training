@@ -132,9 +132,96 @@ if __name__ == "__main__":
 
 
     test = "Vasp"
-    test="Gap"
+    #    test="Gap"
 
 
+    if test == "Vasp":
+
+        input_directory = "input_dir"
+        output_directory = "output_dir"
+        potential_directory = "input_dir"
+
+        binary = "/appl/soft/phys/vasp/6.3.0/gcc-11.2.0/bin/vasp_std"
+        ncores = 128
+
+        structure = read(f"{input_directory}/POSCAR", format="vasp")
+
+        vasp_input_args = {"prec" : 'Accurate',
+                            "xc" : 'PBE',
+                            "ibrion" : -1,
+                            "algo" :  'Normal',
+                            "potim" :  1.0,
+                            "ediff" :  1e-6,
+                            "lwave" : False,
+                            "lcharg" : False,
+                            "ncore" : 16,
+                            "kpar" : 4
+                           #                            "txt": "OUTCAR_test"
+        }
+
+
+
+        driver_args =  {"job-name": "vasp_quip",
+                        "account": "project_2006384",
+                        "queue" : "medium",
+                        "ntasks-per-node": 128,
+                        "nodes": 1,
+                        "walltime": "0-00:10:00",
+                        "output": "out_vasp_quip",
+                        "modules": ["vasp/6.3.0"],
+                        "export_paths": ["VASP_PP_PATH=/projappl/project_2006384/vasp/potentials"],
+                        "command": "srun"}
+
+
+        args ={ "binary"              : binary,
+                "potential_directory" : potential_directory,
+                "input_directory"     : input_directory,
+                "output_directory"    : output_directory,
+                "structure"           : structure,
+                "input_args"          : vasp_input_args,
+                "ncores"              : ncores
+
+        }
+
+        from vasp_calculation import VaspCalc
+        calculation_method = VaspCalc
+
+        istructure = read(f"{input_directory}/POSCAR_initial", format="vasp")
+        fstructure = read(f"{input_directory}/POSCAR_final", format="vasp")
+
+        gap_input_args = {"quip" : True}
+
+        system = "CBr"
+
+        args ={ "binary"              : binary,
+                "potential_directory" : potential_directory,
+                "input_directory"     : input_directory,
+                "output_directory"    : output_directory,
+                "input_args"          : vasp_input_args,
+                "structure"           : istructure,
+                "ncores"              : ncores,
+                "system"              : system
+        }
+
+        from gap_calculation import GapCalc
+
+        calculation_method = GapCalc
+
+        c1 = CalculationContainer(calculation_method,  args )
+
+        args2 = copy.copy(args)
+        args2["structure"] = fstructure
+        c2 = CalculationContainer(calculation_method,  args2 )
+
+        neb_args = {"images": [c1.method, c2.method],
+                    "n_images" : 5,
+                    "climb":False,
+                    "input_directory"     : input_directory,
+                    "output_directory"    : output_directory
+                    }
+
+        n = CalculationContainer(NEB_interface, neb_args )
+        n.run()
 
     if test == "Gap":
         # Do neb calculation using gap
