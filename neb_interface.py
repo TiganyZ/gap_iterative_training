@@ -106,7 +106,7 @@ class NEB_interface(Calculation):
                 self.neb_images = [ image.structure for image in self.images ]
 
 
-            for n in self.neb_images:
+            for i,n in enumerate(self.neb_images):
                 n.calc =  self.calc_func( **self.calc_args )
 
             print(f"> NEB Images ", self.neb_images)
@@ -117,6 +117,10 @@ class NEB_interface(Calculation):
 
             print(self.neb)
 
+
+    def check_convergence(self):
+
+        return
 
     def get_data(self):
         pass

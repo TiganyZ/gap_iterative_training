@@ -261,6 +261,9 @@ if __name__ == "__main__":
 
     outcars= {"combined": ["OUTCAR_1", "OUTCAR_2"]}
 
+    # atoms1 = read( out_files[ keys.index("combined") ] )
+    # atoms2 = read( out_files[ keys.index("isolated") ] )
+
     info = {"previous_database": "./train.xyz",
             "sigma_e" : {"default": 0.001,
                          "nanoporous": 0.002,

@@ -19,6 +19,7 @@ class GapCalc( Calculation ):
         self.structure = self.calc_utils.get_structure(args)
 
 
+
     def setup(self):
         # Copy gap files from directory to where the calculation is
 
@@ -51,10 +52,8 @@ class GapCalc( Calculation ):
                 os.mkdir(f'{out_dir}/gap_files')
             self.utils.copy_only_files(pot_dir, f'{out_dir}/gap_files')
 
-
         self.cwd = os.getcwd()
         os.chdir( out_dir )
-
 
 
         if self.utils.check_key(self.args, "input_args"):
@@ -86,7 +85,7 @@ class GapCalc( Calculation ):
             self.structure.set_calculator(gap)
             print(">>>   Assigning calculator <<<")
             self.calc_func = Potential
-            self.calc_args = {"param_filename":pot_file}
+            self.calc_args = {"param_filename":self.pot_path}
 
 
         else:

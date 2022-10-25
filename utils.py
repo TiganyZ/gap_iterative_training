@@ -114,7 +114,7 @@ class Utils:
         out, errs = p.communicate()
         return out
 
-    def check_subprocess(self, out):
+    def check_subprocess(self, out, verbosity=100):
 
         if out.returncode != 0:
             print(f"""
@@ -124,5 +124,5 @@ class Utils:
             """)
             exit(1)
 
-        if self.verbosity > 50:
+        elif verbosity > 50:
             print(f"CHECK_SUBPROCESS: {out}")
