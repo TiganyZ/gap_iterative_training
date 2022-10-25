@@ -37,7 +37,7 @@ class VaspCalc( Calculation ):
         self.args["input_args"]["directory"] = out_dir
         self.structure.calc = Vasp( **self.args["input_args"] )
         self.calc_func = Vasp
-        self.calc_args = input_args
+        self.calc_args = self.args["input_args"]
 
 
         self.create_run_environment(out_dir)
