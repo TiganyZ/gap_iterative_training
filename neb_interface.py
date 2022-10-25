@@ -189,7 +189,7 @@ if __name__ == "__main__":
         istructure = read(f"{input_directory}/POSCAR_initial", format="vasp")
         fstructure = read(f"{input_directory}/POSCAR_final", format="vasp")
 
-        gap_input_args = {"quip" : True}
+
 
         system = "CBr"
 
@@ -202,10 +202,6 @@ if __name__ == "__main__":
                 "ncores"              : ncores,
                 "system"              : system
         }
-
-        from gap_calculation import GapCalc
-
-        calculation_method = GapCalc
 
         c1 = CalculationContainer(calculation_method,  args )
 
