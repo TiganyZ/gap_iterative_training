@@ -107,12 +107,12 @@ class NEB_interface(Calculation):
 
 
             for i,n in enumerate(self.neb_images):
-                #                if self.images[0].name == "GapCalc":
-                self.calc_args["directory"] = f"{i:02d}"
-                if not os.path.exists(self.calc_args["directory"]):
-                    os.mkdir(self.calc_args["directory"])
-                    self.images[0].copy_potential(self.calc_args["directory"])
-            # else:
+                #if self.images[0].name == "GapCalc":
+                # self.calc_args["directory"] = f"{i:02d}"
+                # if not os.path.exists(self.calc_args["directory"]):
+                #     os.mkdir(self.calc_args["directory"])
+                #     self.images[0].copy_potential(self.calc_args["directory"])
+                # else:
                 #     self.calc_args.pop('dictionary', None)
                 #elif self.calc_args.has_key("directory"):
 
@@ -258,8 +258,8 @@ if __name__ == "__main__":
         neb_args = {"images": [c1.method, c2.method],
                     "n_images" : 5,
                     "climb":False,
-                    "input_directory"     : input_directory,
-                    "output_directory"    : output_directory
+                    "input_directory"     : "./",
+                    "output_directory"    : "neb_calc"
                     }
 
         n = CalculationContainer(NEB_interface, neb_args )
