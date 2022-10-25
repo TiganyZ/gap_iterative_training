@@ -58,8 +58,6 @@ class NEB_interface(Calculation):
         if not os.path.exists( out_dir):
             os.mkdir(out_dir )
 
-
-
         self.cwd = os.getcwd()
         os.chdir(out_dir)
 

@@ -27,7 +27,10 @@ class VaspCalc( Calculation ):
         out_dir = self.args["output_directory"]
         input_dir = self.args["input_directory"]
 
+
+        self.path = os.path.abspath(out_dir)
         self.utils.check_copy_file(pot_dir, "POTCAR", out_dir)
+        self.pot_path = os.path.abspath(f"{pot_dir}/POTCAR" )
 
         # Will create INCAR later
         # self.utils.check_copy_file(input_dir, "INCAR", out_dir)

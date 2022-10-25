@@ -32,6 +32,8 @@ class GapCalc( Calculation ):
         # self.utils.check_copy_file(input_dir, "input", out_dir)
 
         self.utils.check_copy_tree(input_dir, out_dir)
+        self.path = os.path.abspath(out_dir)
+
 
         if f"{input_dir}" == f"{pot_dir}":
             print("""
@@ -79,11 +81,13 @@ class GapCalc( Calculation ):
         if self.utils.check_key(self.args, "system"):
             pot_file = self.utils.check_file_dir_subdir(f'{self.args["system"]}.xml')
             gap = Potential(param_filename=pot_file)
+            self.pot_path = os.path.abspath(pot_file)
 
             self.structure.set_calculator(gap)
             print(">>>   Assigning calculator <<<")
             self.calc_func = Potential
             self.calc_args = {"param_filename":pot_file}
+
 
         else:
             print(f"""
