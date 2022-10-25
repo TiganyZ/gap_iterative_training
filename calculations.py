@@ -101,6 +101,7 @@ class CalculationContainer:
         self.run_get_data = False
 
 
+
     def create_output_directory(self):
         dir_name = f"{self.method_name}_{self.dt}"
         if not os.path.exists(dir_name):
@@ -110,7 +111,6 @@ class CalculationContainer:
 
     def run(self):
 
-        print("about to wreap", (f"{self.method_name}.setup", self.method.setup, "setup"))
         self.method.utils.wrap_function(f"{self.method_name}.setup", self.method.setup, "setup")
         self.run_setup = True
 
@@ -189,6 +189,19 @@ if __name__ == "__main__":
                             "kpar" : 4
                            #                            "txt": "OUTCAR_test"
         }
+
+
+
+        driver_args =  {"job-name": "vasp_quip",
+                        "account": "project_2006384",
+                        "queue" : "medium",
+                        "ntasks-per-node": 128,
+                        "nodes": 1,
+                        "walltime": "0-00:10:00",
+                        "output": "out_vasp_quip",
+                        "modules": ["vasp/6.3.0"],
+                        "export_paths": ["VASP_PP_PATH=/projappl/project_2006384/vasp/potentials"],
+                        "command": "srun"}
 
 
         args ={ "binary"              : binary,

@@ -52,6 +52,11 @@ class VaspCalc( Calculation ):
 
     def create_run_environment(self):
         self.utils.check_keys(self.args, keys=( "ncores", "binary" ) )
+        self.utils.check_keys(self.args, keys=( "ncores", "binary", "driver_args" ) )
+        self.args["driver_args"]["ncores"] = self.args["binary"]
+        self.args["driver_args"]["binary"] = self.args["ncores"]
+
+        driver_template = self.utils.get_driver_template(self.args["driver_args"])
 
         binary = self.args["binary"]
         ncores = self.args["ncores"]
@@ -71,6 +76,8 @@ exitcode = os.system('srun -n {ncores} {binary}')
 
 
     def run(self):
+
+
         # Create the input file for the directory and then compute
         # self.utils.check_keys(self.args, keys=( "structure", "input_args" ) )
 

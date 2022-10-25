@@ -5,6 +5,71 @@ from glob import glob
 
 class Utils:
 
+    def get_driver_template(self, driver_args, just_command=True, job_blurb=None):
+
+        if self.check_key(driver_args, "modules"):
+            driver_args["all_modules"] = "\n ".join( [ "module load " + mod for mod in self.args["driver_args"]["modules"] ] )
+        else:
+            driver_args["all_modules"] = ""
+
+        if self.check_key(driver_args, "export_paths"):
+            driver_args["all_exports"] = "\n ".join( [ "export " + mod      for mod in self.args["driver_args"]["export_paths"] ] )
+        else:
+            driver_args["all_exports"] = ""
+
+        if job_blurb is None:
+            driver_template = """
+#!/bin/bash -l
+#SBATCH --job-name=%(job-name)s
+#SBATCH --account=%(account)s
+#SBATCH -p %(queue)s
+#SBATCH --ntasks-per-node=%(ntasks-per-node)s
+#SBATCH --nodes=%(nodes)s
+#SBATCH -t %(walltime)s
+#SBATCH -o %(output)s
+
+module reset
+%(all_modules)s
+set -xe
+
+%(all_exports)s
+
+%(command)s -n %(ncores)s %(binary)s
+
+            """ % ( driver_args )
+else:
+            driver_template = job_blurb + """                                                                                                       
+                                                                                                                                    
+module reset                                                                                                                        
+%(all_modules)s                                                                                                                     
+set -xe                                                                                                                             
+                                                                                                                                    
+%(all_exports)s                                                                                                                     
+                                                                                                                                    
+%(command)s -n %(ncores)s %(binary)s                                                                                                
+                                                                                                                                    
+            """
+            driver_template = driver_template % ( driver_args )
+    
+            
+        if just_command:
+            driver_template = """                                                                                                   
+#!/bin/bash                                                                                                                         
+%(all_modules)s                                                                                                                     
+                                                                                                                                    
+%(all_exports)s
+
+%(command)s -n %(ncores)s %(binary)s
+
+            """ % ( driver_args )
+
+
+        return driver_template
+
+
+
+
+    
     def wrap_function(self, prefix, function, message):
         print(f"> {prefix}:          {message} ")
         function()
