@@ -22,6 +22,9 @@ class VaspCalc( Calculation ):
     def setup(self):
         # Copy gap files from directory to where the calculation is
 
+        self.utils.check_keys(self.args)
+        out_dir = self.args["output_directory"]
+        pot_dir = self.args["potential_directory"]
 
         self.path = os.path.abspath(out_dir)
         self.utils.check_copy_file(pot_dir, "POTCAR", out_dir)
