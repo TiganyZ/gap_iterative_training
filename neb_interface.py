@@ -173,16 +173,6 @@ if __name__ == "__main__":
                         "command": "srun"}
 
 
-        args ={ "binary"              : binary,
-                "potential_directory" : potential_directory,
-                "input_directory"     : input_directory,
-                "output_directory"    : output_directory,
-                "structure"           : structure,
-                "input_args"          : vasp_input_args,
-                "ncores"              : ncores
-
-        }
-
         from vasp_calculation import VaspCalc
         calculation_method = VaspCalc
 
@@ -200,7 +190,8 @@ if __name__ == "__main__":
                 "input_args"          : vasp_input_args,
                 "structure"           : istructure,
                 "ncores"              : ncores,
-                "system"              : system
+                "system"              : system,
+                "driver_args"         : driver_args
         }
 
         c1 = CalculationContainer(calculation_method,  args )
