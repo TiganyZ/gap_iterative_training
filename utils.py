@@ -19,47 +19,47 @@ class Utils:
 
         if job_blurb is None:
             driver_template = """
-#!/bin/bash -l
-#SBATCH --job-name=%(job-name)s
-#SBATCH --account=%(account)s
-#SBATCH -p %(queue)s
-#SBATCH --ntasks-per-node=%(ntasks-per-node)s
-#SBATCH --nodes=%(nodes)s
-#SBATCH -t %(walltime)s
-#SBATCH -o %(output)s
+            #!/bin/bash -l
+            #SBATCH --job-name=%(job-name)s
+            #SBATCH --account=%(account)s
+            #SBATCH -p %(queue)s
+            #SBATCH --ntasks-per-node=%(ntasks-per-node)s
+            #SBATCH --nodes=%(nodes)s
+            #SBATCH -t %(walltime)s
+            #SBATCH -o %(output)s
 
-module reset
-%(all_modules)s
-set -xe
+            module reset
+            %(all_modules)s
+            set -xe
 
-%(all_exports)s
+            %(all_exports)s
 
-%(command)s -n %(ncores)s %(binary)s
+            %(command)s -n %(ncores)s %(binary)s
 
             """ % ( driver_args )
-else:
+        else:
             driver_template = job_blurb + """                                                                                                       
-                                                                                                                                    
-module reset                                                                                                                        
-%(all_modules)s                                                                                                                     
-set -xe                                                                                                                             
-                                                                                                                                    
-%(all_exports)s                                                                                                                     
-                                                                                                                                    
-%(command)s -n %(ncores)s %(binary)s                                                                                                
-                                                                                                                                    
+
+            module reset                                                                                                                        
+            %(all_modules)s
+            set -xe
+
+            %(all_exports)s                                                                                                                     
+
+            %(command)s -n %(ncores)s %(binary)s                                                                                                
+
             """
             driver_template = driver_template % ( driver_args )
     
             
         if just_command:
             driver_template = """                                                                                                   
-#!/bin/bash                                                                                                                         
-%(all_modules)s                                                                                                                     
-                                                                                                                                    
-%(all_exports)s
+            #!/bin/bash
+            %(all_modules)s
 
-%(command)s -n %(ncores)s %(binary)s
+            %(all_exports)s
+
+            %(command)s -n %(ncores)s %(binary)s
 
             """ % ( driver_args )
 

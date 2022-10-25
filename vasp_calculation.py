@@ -37,9 +37,6 @@ class VaspCalc( Calculation ):
         self.calc_args = input_args
 
 
-        self.cwd = os.getcwd()
-        os.chdir( out_dir )
-
         self.create_run_environment(out_dir)
 
 
