@@ -125,16 +125,16 @@ class Utils:
                 shutil.copy(f, f"{dst}/")
 
 
-    def check_file_dir_subdir(self, file, subdir="gap_files"):
-        if self.check_file('.', file):
+    def check_file_dir_subdir(self, file, dir ='.', subdir="gap_files"):
+        if self.check_file(dir, file):
             print(f"""
             -->   Found file {file} in ./ directory    <--
             """)
-        elif self.check_file(subdir, file):
+        elif self.check_file(f"{dir}/{subdir}", file):
             print(f"""
             -->   Found file {file} in {subdir} subdirectory    <--
             """)
-            file = f"{subdir}/{file}"
+            file = f"{dir}/{subdir}/{file}"
         else:
             print(f"""
                 ###############################################################################

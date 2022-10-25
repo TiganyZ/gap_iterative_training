@@ -22,10 +22,10 @@ class GapCalc( Calculation ):
     def find_potential_file(self, directory):
         # First check this current directory
 
-        pot_file = self.utils.check_file_dir_subdir(f'{self.args["system"]}.xml', subdir="gap_files")
+        pot_file = self.utils.check_file_dir_subdir(f'{self.args["system"]}.xml', dir='.', subdir="gap_files")
 
         if pot_file is None:
-            pot_file = self.utils.check_file_dir_subdir(f'{directory}/{self.args["system"]}.xml', subdir="gap_files")
+            pot_file = self.utils.check_file_dir_subdir(f'{self.args["system"]}.xml', dir=directory, subdir="gap_files")
 
         if pot_file is None:
             print("""
