@@ -65,8 +65,8 @@ class VaspCalc( Calculation ):
             # Make the run_vasp for the number of cores that we want
             with open(f"{out_dir}/run_vasp.py", 'w') as f:
                 f.write(f"""
-    import os
-    exitcode = os.system('srun -n {ncores} {binary}')
+import os
+exitcode = os.system('srun -n {ncores} {binary}')
     """)
 
             cwd = os.getcwd()
