@@ -44,7 +44,7 @@ class GapCalc( Calculation ):
 
         out_dir = self.args["output_directory"]
         pot_file = self.find_potential_file(out_dir)
-        self.pot_path = os.path.abspath(pot_path)
+        self.pot_path = os.path.abspath(pot_file)
         if self.utils.check_key(self.args, "input_args"):
             if self.utils.check_key(self.args["input_args"], "quip"):
                 self.setup_quip(pot_file, out_dir)
