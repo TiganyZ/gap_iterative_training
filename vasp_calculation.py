@@ -49,7 +49,7 @@ class VaspCalc( Calculation ):
         self.args["driver_args"]["ncores"] = self.args["binary"]
         self.args["driver_args"]["binary"] = self.args["ncores"]
 
-        if check_key(self.args, "batch"):
+        if self.utils.check_key(self.args, "batch"):
             driver_template = self.utils.get_driver_template(self.args["driver_args"])
 
         else:
