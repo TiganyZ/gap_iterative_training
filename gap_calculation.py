@@ -88,11 +88,14 @@ class GapCalc( Calculation ):
     def get_data(self):
         pass
 
-    def save(self):
+    def save(self, prefix=''):
         # Write the json file
         from ase.io import jsonio
         dct = self.structure.calc.results  # Get the calculator in a dictionary format
         dct_extra = self.structure.calc.extra_results  # Get the calculator in a dictionary format
-        name = self.utils.get_save_name(self.path, self.result)
+
+        if len(prefix) == 0:
+            prefix = self.name
+        name = self.utils.get_save_name(self.path, self.result, prefix)
         jsonio.write_json(name, dct)
         jsonio.write_json(name.replace( ".json", "_extra,json" ), dct_extra)

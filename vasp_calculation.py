@@ -101,8 +101,10 @@ exitcode = os.system('srun -n {ncores} {binary}')
 
 
 
-    def save(self):
-        name = self.utils.get_save_name(self.path, self.result)
+    def save(self, prefix=""):
+        if len(prefix) == 0:
+            prefix = self.name
+        name = self.utils.get_save_name(self.path, self.result, prefix)
         self.structure.calc.write_json(name)
 
 
