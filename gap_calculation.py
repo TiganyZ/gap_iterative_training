@@ -38,6 +38,11 @@ class GapCalc( Calculation ):
         else:
             return os.path.abspath(pot_file)
 
+    def copy_potential(self, dir):
+        out_dir = self.args["output_directory"]
+        pot_file = self.find_potential_file(out_dir)
+        name = pot_file.split("/")[-1]
+        shutil.copy(pot_file, f"{dir}/{name}")
 
     def setup(self):
         # Copy gap files from directory to where the calculation is

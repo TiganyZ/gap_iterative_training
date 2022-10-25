@@ -43,6 +43,13 @@ class VaspCalc( Calculation ):
         self.create_run_environment(out_dir)
 
 
+    def copy_potential(self, dir):
+        self.utils.check_keys(self.args)
+        out_dir = self.args["output_directory"]
+        pot_dir = self.args["potential_directory"]
+
+        self.utils.check_copy_file(pot_dir, "POTCAR", dir)
+
     def create_run_environment(self, out_dir):
         self.utils.check_keys(self.args, keys=( "ncores", "binary" ) )
         self.utils.check_keys(self.args, keys=( "ncores", "binary", "driver_args" ) )
