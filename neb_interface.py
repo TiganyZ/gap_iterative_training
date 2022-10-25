@@ -110,7 +110,7 @@ class NEB_interface(Calculation):
                 self.calc_args["directory"] = f"{i:02d}"
                 if not os.path.exists(self.calc_args["directory"]):
                     os.mkdir(self.calc_args["directory"])
-                    n.copy_potential(self.calc_args["directory"])
+                    self.images[0].copy_potential(self.calc_args["directory"])
                 n.calc =  self.calc_func( **self.calc_args )
 
             print(f"> NEB Images ", self.neb_images)
