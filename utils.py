@@ -8,12 +8,12 @@ class Utils:
     def get_driver_template(self, driver_args, just_command=True, job_blurb=None):
 
         if self.check_key(driver_args, "modules"):
-            driver_args["all_modules"] = "\n ".join( [ "module load " + mod for mod in self.args["driver_args"]["modules"] ] )
+            driver_args["all_modules"] = "\n ".join( [ "module load " + mod for mod in driver_args["modules"] ] )
         else:
             driver_args["all_modules"] = ""
 
         if self.check_key(driver_args, "export_paths"):
-            driver_args["all_exports"] = "\n ".join( [ "export " + mod      for mod in self.args["driver_args"]["export_paths"] ] )
+            driver_args["all_exports"] = "\n ".join( [ "export " + mod      for mod in driver_args["export_paths"] ] )
         else:
             driver_args["all_exports"] = ""
 

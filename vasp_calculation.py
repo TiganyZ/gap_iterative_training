@@ -49,20 +49,22 @@ class VaspCalc( Calculation ):
         self.args["driver_args"]["ncores"] = self.args["binary"]
         self.args["driver_args"]["binary"] = self.args["ncores"]
 
-        driver_template = self.utils.get_driver_template(self.args["driver_args"])
+        if check_key(self.args, "batch"):
+            driver_template = self.utils.get_driver_template(self.args["driver_args"])
 
-        binary = self.args["binary"]
-        ncores = self.args["ncores"]
-        # Make the run_vasp for the number of cores that we want
-        with open(f"{out_dir}/run_vasp.py", 'w') as f:
-            f.write(f"""
-import os
-exitcode = os.system('srun -n {ncores} {binary}')
-""")
+        else:
+            binary = self.args["binary"]
+            ncores = self.args["ncores"]
+            # Make the run_vasp for the number of cores that we want
+            with open(f"{out_dir}/run_vasp.py", 'w') as f:
+                f.write(f"""
+    import os
+    exitcode = os.system('srun -n {ncores} {binary}')
+    """)
 
-        cwd = os.getcwd()
+            cwd = os.getcwd()
 
-        os.environ["VASP_SCRIPT"]=os.path.abspath(f"{out_dir}/run_vasp.py")
+            os.environ["VASP_SCRIPT"]=os.path.abspath(f"{out_dir}/run_vasp.py")
 
 
 
