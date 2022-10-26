@@ -9,28 +9,24 @@ from calculations import Calculation, CalculationUtils, CalculationContainer
 
 
 class GapCalc( Calculation ):
-
     def __init__(self, args):
         self.name = "GapCalc"
-        self.args = args
+        self.args = args # This is the calculation data
         self.utils = Utils()
         self.calc_utils = CalculationUtils()
+
         self.result = {}
-        self.structure = self.calc_utils.get_structure(args)
+        self.structure = self.args.structure
 
-
-        if self.utils.check_key(args, "make_dirs"):
-            self.make_dirs = self.args["make_dirs"]
-        else:
-            self.make_dirs = True
-
+    def __str__(self):
+        return f"{self.name} = (args = {self.args.__str__()}, result = {self.result})"
 
     def find_potential_file(self, directory):
         # First check this current directory
-        pot_file = self.utils.check_file_dir_subdir(f'{self.args["system"]}.xml', dir='.', subdir="gap_files")
+        pot_file = self.utils.check_file_dir_subdir(f'{self.args.system}.xml', dir='.', subdir="gap_files")
 
         if pot_file is None:
-            pot_file = self.utils.check_file_dir_subdir(f'{self.args["system"]}.xml', dir=directory, subdir="gap_files")
+            pot_file = self.utils.check_file_dir_subdir(f'{self.args.system}.xml', dir=directory, subdir="gap_files")
 
         if pot_file is None:
             print(f"""
@@ -44,7 +40,7 @@ class GapCalc( Calculation ):
             return os.path.abspath(pot_file)
 
     def copy_potential(self, dir):
-        out_dir = self.args["output_directory"]
+        out_dir = self.args.output_directory
         pot_file = self.find_potential_file(out_dir)
         name = pot_file.split("/")[-1]
         shutil.copy(pot_file, f"{dir}/{name}")
@@ -52,14 +48,12 @@ class GapCalc( Calculation ):
     def setup(self):
         # Copy gap files from directory to where the calculation is
 
-        out_dir = self.args["output_directory"]
+        out_dir = self.args.output_directory
         pot_file = self.find_potential_file(out_dir)
         self.pot_path = os.path.abspath(pot_file)
-        if self.utils.check_key(self.args, "input_args"):
-            if self.utils.check_key(self.args["input_args"], "quip"):
-                self.setup_quip(pot_file, out_dir)
-            else:
-                self.setup_turbogap()
+
+        if self.utils.check_key(self.args.input_args, "quip"):
+            self.setup_quip(pot_file, out_dir)
         else:
             self.setup_turbogap()
 

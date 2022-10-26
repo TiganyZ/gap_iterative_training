@@ -7,26 +7,40 @@ from ase.optimize import BFGS
 from ase.constraints import FixAtoms
 import os, shutil, subprocess, copy
 from utils import Utils
-from calculations import Calculation, CalculationUtils, CalculationContainer
+from calculations import Calculation, CalculationUtils, CalculationContainer, CalculationData
+from dataclasses import dataclass, field
+
+@dataclass
+class NEB_data:
+    images: list[CalculationContainer]
+    n_images : int
+    climb: bool = True
+    input_directory: str = "./"
+    output_directory: str = "neb_calc"
+    read_traj: str = ""
+
+
 
 class NEB_interface(Calculation):
     def __init__(self, args):
 
         self.name = "NebCalc"
         self.args = args
-        self.images = args["images"]
+        self.images = args.images
         self.utils = Utils()
 
-        if self.utils.check_key(args, "climb"):
-            self.climb = self.args["climb"]
-        else:
-            self.climb = False
+        self.climb = self.args.climb
+
+
+    def __str__(self):
+        return f"{self.name} = (args = {self.args.__str__()}, images = {'\n image ='.join([image.__str__() for image in self.images])})"
+
 
 
     def get_calc(self):
-        if self.utils.check_key(self.args, "calc_func") and self.utils.check_key(self.args, "calc_args"):
-            self.calc_func = self.args["calc_func"]
-            self.calc_args = self.args["calc_args"]
+        if hasattr(self.args, "calc_func") and hasattr(self.args, "calc_args"):
+            self.calc_func = self.args.calc_func
+            self.calc_args = self.args.calc_args
         else:
             print("""
             ###############################################################################
@@ -53,7 +67,7 @@ class NEB_interface(Calculation):
 
         self.get_all_images()
 
-        out_dir = self.args["output_directory"]
+        out_dir = self.args.output_directory
 
         if not os.path.exists( out_dir):
             os.mkdir(out_dir )
@@ -71,10 +85,10 @@ class NEB_interface(Calculation):
 
         self.get_calc()
 
-        if self.utils.check_key(self.args, "read_traj"):
+        if not (self.args.read_traj == ""):
             # Read from the trajectory fild
-            n_images = self.args["n_images"]
-            traj_file = self.args["read_traj"]
+            n_images = self.args.n_images
+            traj_file = self.args.read_traj
             self.neb_images = read(f'{traj_file}@-{n_images}:')
             self.neb = NEB(self.neb_images, climb=self.climb)
         else:
@@ -92,8 +106,8 @@ class NEB_interface(Calculation):
                 """)
 
 
-                if self.utils.check_key(self.args, "n_images"):
-                    self.neb_images = [initial.copy() for _ in range(self.args["n_images"] -1)] + [final]
+                if hasattr(self.args, "n_images"):
+                    self.neb_images = [initial.copy() for _ in range(self.args.n_images -1)] + [final]
                 else:
                     print("""
                     #####################################################################################################
@@ -242,15 +256,15 @@ if __name__ == "__main__":
 
         system = "CBr"
 
-        args ={ "binary"              : binary,
-                "potential_directory" : potential_directory,
-                "input_directory"     : input_directory,
-                "output_directory"    : output_directory,
-                "input_args"          : gap_input_args,
-                "structure"           : istructure,
-                "ncores"              : ncores,
-                "system"              : system
-        }
+        args = CalculationData(binary = binary,
+                               potential_directory = potential_directory,
+                               input_directory     = input_directory,
+                               output_directory    = output_directory,
+                               input_args          = gap_input_args,
+                               structure           = istructure,
+                               ncores              = ncores,
+                               system              = system
+                               )
 
         from gap_calculation import GapCalc
 
@@ -258,16 +272,21 @@ if __name__ == "__main__":
 
         c1 = CalculationContainer(calculation_method,  args )
 
-        args2 = copy.copy(args)
-        args2["structure"] = fstructure
+        args2 = CalculationData(binary = binary,
+                                potential_directory = potential_directory,
+                                input_directory     = input_directory,
+                                output_directory    = output_directory,
+                                input_args          = gap_input_args,
+                                structure           = fstructure,
+                                ncores              = ncores,
+                                system              = system
+                               )
+
         c2 = CalculationContainer(calculation_method,  args2 )
 
-        neb_args = {"images": [c1.method, c2.method],
-                    "n_images" : 5,
-                    "climb":False,
-                    "input_directory"     : "./",
-                    "output_directory"    : "neb_calc"
-                    }
-
+        neb_args = NEB_data(images = [c1.method, c2.method],
+                            n_images = 5,
+                            climb = False
+                            )
         n = CalculationContainer(NEB_interface, neb_args )
         n.run()

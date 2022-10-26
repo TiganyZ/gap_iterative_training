@@ -7,7 +7,24 @@ from ase.io import read, write
 from ase.calculators.vasp import Vasp
 import os, shutil, subprocess
 from utils import Utils
+
 # from process_calculation import GAP_to_VASP, VASP_to_GAP
+
+from dataclasses import dataclass
+
+@dataclass
+class CalculationData:
+    input_directory: str
+    output_directory: str
+    potential_directory: str
+    binary: str
+    input_args: dict
+    structure: Atoms
+    ncores: int
+    system: str
+    make_dirs: bool = True
+    driver_args: dict = field(default_factory=dict)
+    batch: bool = False
 
 
 
@@ -35,25 +52,12 @@ class CalculationUtils:
         self.utils = Utils()
 
 
-    def get_structure(self, args):
-
-        if self.utils.check_key(args, "structure" ):
-            return args["structure"]
-        else:
-            print("""
-            ########################################################################################
-            ###---   WARNING: Structure not passed to arguments. Specify before calculation   ---###
-            ########################################################################################
-            """)
-            return None
-
-
     def determine_calculation_type(self, args):
         calc_types = [ "energy" ]
 
         calc_type = "energy"
         for c in calc_types:
-            if self.utils.check_key(args, c):
+            if hasattr(args, c):
                 calc_type = c
 
         return calc_type
@@ -217,15 +221,14 @@ if __name__ == "__main__":
                         "command": "srun"}
 
 
-        args ={ "binary"              : binary,
-                "potential_directory" : potential_directory,
-                "input_directory"     : input_directory,
-                "output_directory"    : output_directory,
-                "structure"           : structure,
-                "input_args"          : vasp_input_args,
-                "ncores"              : ncores
-
-        }
+        args = CalculationData( binary              = binary,
+                                potential_directory = potential_directory,
+                                input_directory     = input_directory,
+                                output_directory    = output_directory,
+                                structure           = structure,
+                                input_args          = vasp_input_args,
+                                ncores              = ncores
+                               )
 
         from vasp_calculation import VaspCalc
         calculation_method = VaspCalc
