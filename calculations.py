@@ -10,7 +10,7 @@ from utils import Utils
 
 # from process_calculation import GAP_to_VASP, VASP_to_GAP
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 @dataclass
 class CalculationData:
