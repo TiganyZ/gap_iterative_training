@@ -114,6 +114,7 @@ class NEB_interface(Calculation):
                      self.images[0].copy_potential(self.calc_args["directory"])
                 # else:
                 # self.calc_args.pop('directory', None)
+
                 #elif self.calc_args.has_key("directory"):
 
                 n.calc =  self.calc_func( **self.calc_args )
