@@ -63,7 +63,7 @@ class NEB_interface(Calculation):
 
 
     def run(self):
-        optimizer = BFGS(self.neb, trajectory='neb_climb.traj')
+        optimizer = BFGS(self.neb, trajectory='neb_climb.traj', restart = f"{self.name}_BFGS_restart_file")
         optimizer.run(fmax=0.04)
 
 
