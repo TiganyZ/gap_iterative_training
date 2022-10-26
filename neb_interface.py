@@ -212,29 +212,35 @@ if __name__ == "__main__":
 
         system = "CBr"
 
-        args ={ "binary"              : binary,
-                "potential_directory" : potential_directory,
-                "input_directory"     : input_directory,
-                "output_directory"    : output_directory,
-                "input_args"          : vasp_input_args,
-                "structure"           : istructure,
-                "ncores"              : ncores,
-                "system"              : system,
-                "driver_args"         : driver_args
-        }
+        args = CalculationData(binary = binary,
+                               potential_directory = potential_directory,
+                               input_directory     = input_directory,
+                               output_directory    = output_directory,
+                               input_args          = gap_input_args,
+                               structure           = istructure,
+                               ncores              = ncores,
+                               system              = system
+                               )
+
 
         c1 = CalculationContainer(calculation_method,  args )
 
-        args2 = copy.copy(args)
-        args2["structure"] = fstructure
+        args2 = CalculationData(binary = binary,
+                                potential_directory = potential_directory,
+                                input_directory     = input_directory,
+                                output_directory    = output_directory,
+                                input_args          = gap_input_args,
+                                structure           = fstructure,
+                                ncores              = ncores,
+                                system              = system
+                               )
+
         c2 = CalculationContainer(calculation_method,  args2 )
 
-        neb_args = {"images": [c1.method, c2.method],
-                    "n_images" : 5,
-                    "climb":False,
-                    "input_directory"     : "./",
-                    "output_directory"    : "neb_calc"
-                    }
+        neb_args = NEB_data(images = [c1.method, c2.method],
+                            n_images = 5,
+                            climb = False
+                            )
 
         n = CalculationContainer(NEB_interface, neb_args )
         n.run()
