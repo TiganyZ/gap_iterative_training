@@ -99,7 +99,7 @@ class CalculationContainer:
         now = datetime.now()
         self.dt = now.strftime("%Y-%m-%d--%H-%M-%S")
 
-        if not "output_directory"  in args.keys():
+        if args.output_directory == "":
             output_directory = self.create_output_directory()
             self.method.args["output_directory"] = output_directory
         out_dir = args["output_directory"]
