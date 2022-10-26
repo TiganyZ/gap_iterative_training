@@ -28,7 +28,7 @@ class VaspCalc( Calculation ):
         self.pot_path = os.path.abspath(f"{pot_dir}/POTCAR" )
 
 
-        if self.make_dirs:
+        if self.args.make_dirs:
             self.copy_potential(out_dir)
             self.path = os.path.abspath(out_dir)
         else:
