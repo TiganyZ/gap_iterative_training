@@ -216,7 +216,7 @@ if __name__ == "__main__":
                                potential_directory = potential_directory,
                                input_directory     = input_directory,
                                output_directory    = output_directory,
-                               input_args          = gap_input_args,
+                               input_args          = vasp_input_args,
                                structure           = istructure,
                                ncores              = ncores,
                                system              = system
@@ -229,7 +229,7 @@ if __name__ == "__main__":
                                 potential_directory = potential_directory,
                                 input_directory     = input_directory,
                                 output_directory    = output_directory,
-                                input_args          = gap_input_args,
+                                input_args          = vasp_input_args,
                                 structure           = fstructure,
                                 ncores              = ncores,
                                 system              = system
