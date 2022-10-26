@@ -101,9 +101,9 @@ class CalculationContainer:
 
         if args.output_directory == "":
             output_directory = self.create_output_directory()
-            self.method.args["output_directory"] = output_directory
-        out_dir = args["output_directory"]
-        input_dir = args["input_directory"]
+            self.method.args.output_directory = output_directory
+        out_dir = args.output_directory
+        input_dir = args.input_directory
 
         self.utils = Utils()
         self.utils.check_copy_tree(input_dir, out_dir)
