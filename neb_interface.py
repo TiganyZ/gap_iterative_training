@@ -33,7 +33,7 @@ class NEB_interface(Calculation):
 
 
     def __str__(self):
-        return f"{self.name} = (args = {self.args.__str__()}, images = {'\n image ='.join([image.__str__() for image in self.images])})"
+        return f"{self.name} = (args = {self.args.__str__()}, images = \n{' image ='.join([image.__str__() for image in self.images])})"
 
 
 
