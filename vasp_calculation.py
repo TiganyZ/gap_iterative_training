@@ -155,7 +155,7 @@ exitcode = os.system('srun -n {ncores} {binary}')
             filename = self.utils.get_save_name(dir, {}, f"{self.name}_{dir}", ext=".xyz")
             write( f"{dir}/{filename}", atoms, format="extxyz" )
 
-            self.utils.save_file_in_dir(self, filename, dir, "images" )
+            self.utils.save_file_in_dir(filename, dir, "images" )
 
 
             return forces
