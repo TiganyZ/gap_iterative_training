@@ -219,8 +219,7 @@ class Utils:
         else:
             f[-1] = f"_{n_files}." + f[-1]
             filename = ''.join(f)
-        else:
-            filename = f"{file}_{n_files}"
+
         return filename
 
 
