@@ -195,6 +195,9 @@ class Utils:
 
 
     def get_save_name(self, path, result, prefix, ext=".json"):
+        if not os.path.exists(path):
+            os.mkdir(path)
+
         l = os.listdir(path)
 
         if len(prefix) == 0:
@@ -211,7 +214,9 @@ class Utils:
 
     def get_filename_for_dir(self, file, n_files):
         f = file.split(".")
-        if len(f) > 1:
+        if len(f) == 1:
+            filename = f"{file}_{n_files}"
+        else:
             f[-1] = f"_{n_files}." + f[-1]
             filename = ''.join(f)
         else:
