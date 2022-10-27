@@ -136,7 +136,7 @@ class NEB_interface(Calculation):
                 n.calc =  self.calc_func( **self.calc_args )
 
                 # Redefine the forces so we can use the training data
-                n.get_forces = self.images[0].save_get_forces(n)
+                n.get_forces = self.images[0].save_get_forces(n, dir=f"0{i}")
 
 
             print(f"> NEB Images ", self.neb_images)

@@ -114,7 +114,7 @@ exitcode = os.system('srun -n {ncores} {binary}')
 """)
 
 
-    def save_get_forces(self, atoms, name=""):
+    def save_get_forces(self, atoms, name="", dir="00"):
 
 
         # The below is modified from ASE, this is so we can get all the OUTCAR files saved somewhere during calculation
@@ -150,11 +150,11 @@ exitcode = os.system('srun -n {ncores} {binary}')
             filename = self.utils.get_save_name('./', {}, f"{self.name}_calc")
             atoms.calc.write_json(filename)
 
-            if os.path.exists("OUTCAR"):
-                if not os.path.exists("outcars"):
-                    os.mkdir("outcars")
-                n_outcars = len(os.listdir("outcars"))
-                shutil.copy("OUTCAR", f"outcars/OUTCAR_{n_outcars}")
+            if os.path.exists(f"{dir}/OUTCAR"):
+                if not os.path.exists(f"{dir}/outcars"):
+                    os.mkdir(f"{dir}/outcars")
+                n_outcars = len(os.listdir(f"{dir}/outcars"))
+                shutil.copy("OUTCAR", f"{dir}/outcars/OUTCAR_{n_outcars}")
             return forces
 
 
