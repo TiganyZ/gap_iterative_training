@@ -148,7 +148,7 @@ exitcode = os.system('srun -n {ncores} {binary}')
 
             #self.structure.calc.write_json(name)
             filename = self.utils.get_save_name('./', {}, f"{self.name}_calc")
-            atoms.write_json(filename)
+            atoms.calc.write_json(filename)
 
             if os.path.exists("OUTCAR"):
                 if not os.path.exists("outcars"):
