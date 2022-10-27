@@ -281,6 +281,8 @@ e0 = {self.e0}
 if __name__ == "__main__":
 
 
+
+
     system = "CBr"
 
     outcars= {"combined": ["OUTCAR_1", "OUTCAR_2"]}
