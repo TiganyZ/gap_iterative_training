@@ -147,14 +147,14 @@ exitcode = os.system('srun -n {ncores} {binary}')
                         constraint.adjust_forces(atoms, forces)
 
             #self.structure.calc.write_json(name)
-            filename = self.utils.get_save_name('./', {}, f"{self.name}_calc")
-            atoms.calc.write_json(filename)
+            filename = self.utils.get_save_name(dir, {}, f"{self.name}_calc")
+            atoms.calc.write_json(f"{dir}/{filename}")
+            self.utils.save_file_in_dir(self, filename, dir, "jsons" )
 
             self.utils.save_file_in_dir(self, "OUTCAR", dir, "outcars" )
 
             filename = self.utils.get_save_name(dir, {}, f"{self.name}_{dir}", ext=".xyz")
             write( f"{dir}/{filename}", atoms, format="extxyz" )
-
             self.utils.save_file_in_dir(filename, dir, "images" )
 
 
