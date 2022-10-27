@@ -148,13 +148,13 @@ exitcode = os.system('srun -n {ncores} {binary}')
 
             #self.structure.calc.write_json(name)
             filename = self.utils.get_save_name(dir, {}, f"{self.name}_calc")
-            atoms.calc.write_json(f"{dir}/{filename}")
+            atoms.calc.write_json(f"{filename}")
             self.utils.save_file_in_dir(filename, dir, "jsons" )
 
             self.utils.save_file_in_dir("OUTCAR", dir, "outcars" )
 
             filename = self.utils.get_save_name(dir, {}, f"{self.name}_{dir}", ext=".xyz")
-            write( f"{dir}/{filename}", atoms, format="extxyz" )
+            write( f"{filename}", atoms, format="extxyz" )
             self.utils.save_file_in_dir(filename, dir, "images" )
 
 
