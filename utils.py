@@ -223,6 +223,6 @@ class Utils:
         counter = 0
         while name+suffix+ext in l:
             suffix = f"_{counter:d}"
-            Counter += 1
+            counter += 1
 
         return name+suffix+ext
