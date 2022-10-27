@@ -218,10 +218,10 @@ class Utils:
             if n_files > 0:
                 # Check if the file is the same or not
                 cmd = "diff {dir}/{file} {dir}/{savedir}/{file}_{n_files - 1} | wc -l"
-                l = self.utils.piped_subprocess(cmd)
+                l = self.piped_subprocess(cmd)
                 if int(l) > 0:
                     f = file.split(".")
-                    if len(f) > 1:
+                    if len(f) > 0:
                         f[-1] = f"_{n_files}." + f[-1]
                         filename = ''.join(f)
                     else:
