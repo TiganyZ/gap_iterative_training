@@ -154,7 +154,7 @@ exitcode = os.system('srun -n {ncores} {binary}')
                 if not os.path.exists(f"{dir}/outcars"):
                     os.mkdir(f"{dir}/outcars")
                 n_outcars = len(os.listdir(f"{dir}/outcars"))
-                shutil.copy("OUTCAR", f"{dir}/outcars/OUTCAR_{n_outcars}")
+                shutil.copy(f"{dir}/OUTCAR", f"{dir}/outcars/OUTCAR_{n_outcars}")
             return forces
 
 
