@@ -144,6 +144,11 @@ class GapCalc( Calculation ):
             jsonio.write_json(name.replace( ".json", "_extra.json" ), dct_extra)
 
 
+            filename = self.utils.get_save_name(dir, {}, f"{self.name}_{dir}", ext=".xyz")
+            write( f"{dir}/{filename}", atoms, format="extxyz" )
+
+            self.utils.save_file_in_dir(self, filename, dir, "images" )
+
             return forces
 
 
