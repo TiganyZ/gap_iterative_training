@@ -168,6 +168,7 @@ class Utils:
 
     def piped_subprocess(self, commands, file=None):
         for i, cmd in enumerate(commands.split("|")):
+            print(cmd.split())
             if i == 0:
                 p = subprocess.Popen(cmd.split(), stdout = subprocess.PIPE )
             if i == len(commands.split("|"))-1 and file is not None:
@@ -181,6 +182,7 @@ class Utils:
         return out
 
     def check_subprocess(self, out, verbosity=100):
+        print(out)
 
         if out.returncode != 0:
             print(f"""
