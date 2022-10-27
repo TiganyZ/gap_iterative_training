@@ -154,7 +154,13 @@ exitcode = os.system('srun -n {ncores} {binary}')
                 if not os.path.exists(f"{dir}/outcars"):
                     os.mkdir(f"{dir}/outcars")
                 n_outcars = len(os.listdir(f"{dir}/outcars"))
-                shutil.copy(f"{dir}/OUTCAR", f"{dir}/outcars/OUTCAR_{n_outcars}")
+                if n_outcars > 0:
+                    # Check if the file is the same or not
+                    cmd = "diff {dir}/OUTCAR {dir}/outcars/OUTCAR_{n_outcars - 1} | wc -l"
+                    l = self.utils.piped_subprocess(cmd)
+                    if int(l) > 0:
+                        shutil.copy(f"{dir}/OUTCAR", f"{dir}/outcars/OUTCAR_{n_outcars}")
+
             return forces
 
 

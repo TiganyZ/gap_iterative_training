@@ -167,7 +167,7 @@ if __name__ == "__main__":
 
 
     test = "Vasp"
-    #    test="Gap"
+    test="Gap"
 
 
     if test == "Vasp":
