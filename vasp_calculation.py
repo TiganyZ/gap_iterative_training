@@ -153,7 +153,7 @@ exitcode = os.system('srun -n {ncores} {binary}')
             atoms.calc.write_json(f"jsons/{filename}")
             #self.utils.save_file_in_dir(filename, dir, "jsons" )
 
-            filename = self.utils.get_save_name(f"{dir}/outcars", {}, "OUTCAR")
+            filename = self.utils.get_save_name(f"{dir}/outcars", {}, "OUTCAR", ext="")
             shutil.copy(f"{dir}/OUTCAR", f"{dir}/outcars/{filename}" )
             #self.utils.save_file_in_dir("OUTCAR", dir, "outcars" )
 
