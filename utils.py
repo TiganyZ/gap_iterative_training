@@ -176,6 +176,7 @@ class Utils:
             else:
                 p = subprocess.Popen(cmd.split(), stdin=p.stdout, stdout = subprocess.PIPE )
 
+            p.wait()
             self.check_subprocess(p)
 
         out, errs = p.communicate()
