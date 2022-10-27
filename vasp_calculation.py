@@ -114,7 +114,7 @@ exitcode = os.system('srun -n {ncores} {binary}')
 """)
 
 
-    def save_get_forces(self, atoms, name):
+    def save_get_forces(self, atoms, name=""):
 
 
         # The below is modified from ASE, this is so we can get all the OUTCAR files saved somewhere during calculation

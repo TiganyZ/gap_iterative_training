@@ -97,7 +97,7 @@ class GapCalc( Calculation ):
         jsonio.write_json(name.replace( ".json", "_extra.json" ), dct_extra)
 
 
-    def save_get_forces(self, atoms, name):
+    def save_get_forces(self, atoms, name=""):
 
 
         # The below is modified from ASE, this is so we can get all the OUTCAR files saved somewhere during calculation
