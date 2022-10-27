@@ -150,16 +150,13 @@ exitcode = os.system('srun -n {ncores} {binary}')
             filename = self.utils.get_save_name('./', {}, f"{self.name}_calc")
             atoms.calc.write_json(filename)
 
-            if os.path.exists(f"{dir}/OUTCAR"):
-                if not os.path.exists(f"{dir}/outcars"):
-                    os.mkdir(f"{dir}/outcars")
-                n_outcars = len(os.listdir(f"{dir}/outcars"))
-                if n_outcars > 0:
-                    # Check if the file is the same or not
-                    cmd = "diff {dir}/OUTCAR {dir}/outcars/OUTCAR_{n_outcars - 1} | wc -l"
-                    l = self.utils.piped_subprocess(cmd)
-                    if int(l) > 0:
-                        shutil.copy(f"{dir}/OUTCAR", f"{dir}/outcars/OUTCAR_{n_outcars}")
+            self.utils.save_file_in_dir(self, "OUTCAR", dir, "outcars" )
+
+            filename = self.utils.get_save_name(dir, {}, f"{self.name}_{dir}", ext=".xyz")
+            write( f"{dir}/{filename}", atoms, format="extxyz" )
+
+            self.utils.save_file_in_dir(self, filename, dir, "images" )
+
 
             return forces
 

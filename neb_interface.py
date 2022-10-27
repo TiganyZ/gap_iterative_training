@@ -21,6 +21,8 @@ class NEB_data:
 
 
 
+
+
 class NEB_interface(Calculation):
     def __init__(self, args):
 
