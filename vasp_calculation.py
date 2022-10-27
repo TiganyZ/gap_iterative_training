@@ -114,7 +114,51 @@ exitcode = os.system('srun -n {ncores} {binary}')
 """)
 
 
+    def save_get_forces(self, atoms, name):
 
+
+        # The below is modified from ASE, this is so we can get all the OUTCAR files saved somewhere during calculation
+        def get_forces(apply_constraint=True, md=False):
+            """Calculate atomic forces.
+
+            Ask the attached calculator to calculate the forces and apply
+            constraints.  Use *apply_constraint=False* to get the raw
+            forces.
+
+            For molecular dynamics (md=True) we don't apply the constraint
+            to the forces but to the momenta. When holonomic constraints for
+            rigid linear triatomic molecules are present, ask the constraints
+            to redistribute the forces within each triple defined in the
+            constraints (required for molecular dynamics with this type of
+            constraints)."""
+
+            if atoms._calc is None:
+                raise RuntimeError('Atoms object has no calculator.')
+            forces = atoms._calc.get_forces(atoms)
+
+            if apply_constraint:
+                # We need a special md flag here because for MD we want
+                # to skip real constraints but include special "constraints"
+                # Like Hookean.
+                for constraint in atoms.constraints:
+                    if md and hasattr(constraint, 'redistribute_forces_md'):
+                        constraint.redistribute_forces_md(atoms, forces)
+                    if not md or hasattr(constraint, 'adjust_potential_energy'):
+                        constraint.adjust_forces(atoms, forces)
+
+            #self.structure.calc.write_json(name)
+            filename = self.utils.get_save_name('./', {}, f"{self.name}_calc")
+            atoms.write_json(filename)
+
+            if os.path.exists("OUTCAR"):
+                if not os.path.exists("outcars"):
+                    os.mkdir(outcars)
+                n_outcars = len(os.listdir("outcars"))
+                shutil.copy("OUTCAR", f"outcars/OUTCAR_{n_outcars}")
+            return forces
+
+
+        return get_forces
 
     def get_data(self):
         pass

@@ -193,7 +193,7 @@ class Utils:
             print(f"CHECK_SUBPROCESS: {out}")
 
 
-    def get_save_name(self, path, result, prefix):
+    def get_save_name(self, path, result, prefix, ext=".json"):
         l = os.listdir(path)
 
         if len(prefix) == 0:
@@ -202,7 +202,7 @@ class Utils:
             name = prefix
         suffix=''
         counter = 0
-        while name+suffix+".json" in l:
+        while name+suffix+ext in l:
             suffix = f"_{counter:d}"
 
-        return name+suffix+".json"
+        return name+suffix+ext

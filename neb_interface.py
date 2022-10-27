@@ -81,6 +81,8 @@ class NEB_interface(Calculation):
         optimizer.run(fmax=0.04)
 
 
+
+
     def get_all_images(self):
 
         self.get_calc()
@@ -132,6 +134,10 @@ class NEB_interface(Calculation):
                 #elif self.calc_args.has_key("directory"):
 
                 n.calc =  self.calc_func( **self.calc_args )
+
+                # Redefine the forces so we can use the training data
+                n.get_forces = self.images[i].save_get_forces
+
 
             print(f"> NEB Images ", self.neb_images)
             self.neb = NEB(self.neb_images, climb=self.climb)
