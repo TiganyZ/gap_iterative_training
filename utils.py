@@ -217,7 +217,7 @@ class Utils:
             n_files = len(os.listdir(f"{dir}/{savedir}"))
             if n_files > 0:
                 # Check if the file is the same or not
-                cmd = "diff {dir}/{file} {dir}/{savedir}/{file}_{n_files - 1} | wc -l"
+                cmd = f"diff {dir}/{file} {dir}/{savedir}/{file}_{n_files - 1} | wc -l"
                 l = self.piped_subprocess(cmd)
                 if int(l) > 0:
                     f = file.split(".")
