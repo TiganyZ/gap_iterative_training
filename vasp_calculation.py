@@ -15,6 +15,7 @@ class VaspCalc( Calculation ):
         self.utils = Utils()
         self.calc_utils = CalculationUtils()
         self.result = {}
+        self.counter = 0
 
         self.structure = self.args.structure
 
@@ -147,21 +148,23 @@ exitcode = os.system('srun -n {ncores} {binary}')
                         constraint.adjust_forces(atoms, forces)
 
             #self.structure.calc.write_json(name)
-            filename = self.utils.get_save_name(f"{dir}/jsons", {}, f"{self.name}_calc")
-            atoms.calc.write_json(f"jsons/{filename}")
-            #self.utils.save_file_in_dir(filename, dir, "jsons" )
+            if self.counter % 4 == 0:
+                filename = self.utils.get_save_name(f"{dir}/jsons", {}, f"{self.name}_calc")
+                atoms.calc.write_json(f"jsons/{filename}")
+                #self.utils.save_file_in_dir(filename, dir, "jsons" )
 
-            filename = self.utils.get_save_name(f"{dir}/outcars", {}, "OUTCAR")
-            self.utils.save_file_in_dir("OUTCAR", dir, "outcars" )
+                filename = self.utils.get_save_name(f"{dir}/outcars", {}, "OUTCAR")
+                shutil.copy(f"{dir}/OUTCAR", f"{dir}/outcars/{filename}" )
+                #self.utils.save_file_in_dir("OUTCAR", dir, "outcars" )
 
-            filename = self.utils.get_save_name(f"{dir}/images", {}, f"{self.name}_{dir}", ext=".xyz")
-            write( f"{dir}/images/{filename}", atoms, format="extxyz" )
-            #self.utils.save_file_in_dir(filename, dir, "images" )
+                filename = self.utils.get_save_name(f"{dir}/images", {}, f"{self.name}_{dir}", ext=".xyz")
+                write( f"{dir}/images/{filename}", atoms, format="extxyz" )
+                #self.utils.save_file_in_dir(filename, dir, "images" )
 
 
             return forces
 
-
+        self.counter += 1
         return get_forces
 
     def get_data(self):
