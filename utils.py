@@ -209,6 +209,16 @@ class Utils:
 
         return name+suffix+ext
 
+    def get_filename_for_dir(self, file, n_files):
+        f = file.split(".")
+        if len(f) > 1:
+            f[-1] = f"_{n_files}." + f[-1]
+            filename = ''.join(f)
+        else:
+            filename = f"{file}_{n_files}"
+        return filename
+
+
 
     def save_file_in_dir(self, file, dir, savedir ):
         if os.path.exists(f"{dir}/{file}"):
@@ -217,18 +227,14 @@ class Utils:
             n_files = len(os.listdir(f"{dir}/{savedir}"))
             if n_files > 0:
                 # Check if the file is the same or not
-                cmd = f"diff {dir}/{file} {dir}/{savedir}/{file}_{n_files - 1} | wc -l"
+                prev_filename = self.get_filename_for_dir(file, n_files-1)
+                cmd = f"diff {dir}/{file} {dir}/{savedir}/{prev_filename} | wc -l"
                 print(cmd)
                 l = self.piped_subprocess(cmd)
                 if int(l) > 0:
-                    f = file.split(".")
-                    if len(f) > 0:
-                        f[-1] = f"_{n_files}." + f[-1]
-                        filename = ''.join(f)
-                    else:
-                        filename = f"{file}_{n_files}"
-                        shutil.copy(f"{dir}/{file}", f"{dir}/{savedir}/{filename}")
+                    filename = self.get_filename_for_dir(file, n_files)
+                    shutil.copy(f"{dir}/{file}", f"{dir}/{savedir}/{filename}")
 
             else:
-                filename = f"{file}_{n_files}"
+                filename = self.get_filename_for_dir(file, n_files)
                 shutil.copy(f"{dir}/{file}", f"{dir}/{savedir}/{filename}")
