@@ -165,24 +165,6 @@ class Utils:
         if self.check_file(directory, file) and os.path.exists(f"{output_directory}"):
             shutil.copy( f"{directory}/{file}", f"{output_directory}/" )
 
-    def save_file_in_dir(self, file, dir, savedir ):
-        if os.path.exists(f"{dir}/{file}"):
-            if not os.path.exists(f"{dir}/{savedir}"):
-                os.mkdir(f"{dir}/{savedir}")
-            n_files = len(os.listdir(f"{dir}/{savedir}"))
-            if n_files > 0:
-                # Check if the file is the same or not
-                cmd = "diff {dir}/{file} {dir}/{savedir}/{file}_{n_files - 1} | wc -l"
-                l = self.utils.piped_subprocess(cmd)
-                if int(l) > 0:
-                    f = file.split(".")
-                    if len(f) > 1:
-                        f[-1] = f"_{n_files}." + f[-1]
-                        filename = ''.join(f)
-                    else:
-                        filename = f"{file}_{n_files}"
-                    shutil.copy(f"{dir}/{file}", f"{dir}/{savedir}/{filename}")
-
 
     def piped_subprocess(self, commands, file=None):
         for i, cmd in enumerate(commands.split("|")):
@@ -226,3 +208,26 @@ class Utils:
             counter += 1
 
         return name+suffix+ext
+
+
+    def save_file_in_dir(self, file, dir, savedir ):
+        if os.path.exists(f"{dir}/{file}"):
+            if not os.path.exists(f"{dir}/{savedir}"):
+                os.mkdir(f"{dir}/{savedir}")
+            n_files = len(os.listdir(f"{dir}/{savedir}"))
+            if n_files > 0:
+                # Check if the file is the same or not
+                cmd = "diff {dir}/{file} {dir}/{savedir}/{file}_{n_files - 1} | wc -l"
+                l = self.utils.piped_subprocess(cmd)
+                if int(l) > 0:
+                    f = file.split(".")
+                    if len(f) > 1:
+                        f[-1] = f"_{n_files}." + f[-1]
+                        filename = ''.join(f)
+                    else:
+                        filename = f"{file}_{n_files}"
+                        shutil.copy(f"{dir}/{file}", f"{dir}/{savedir}/{filename}")
+
+            else:
+                filename = f"{file}_{n_files}"
+                shutil.copy(f"{dir}/{file}", f"{dir}/{savedir}/{filename}")
