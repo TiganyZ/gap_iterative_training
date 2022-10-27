@@ -8,7 +8,10 @@ from ase.constraints import FixAtoms
 import os, shutil, subprocess, copy
 from utils import Utils
 from calculations import Calculation, CalculationUtils, CalculationContainer, CalculationData
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, asdict
+
+import pickle
+
 
 @dataclass
 class NEB_data:
@@ -81,7 +84,6 @@ class NEB_interface(Calculation):
     def run(self):
         optimizer = BFGS(self.neb, trajectory='neb_climb.traj', restart = f"{self.name}_BFGS_restart_file")
         optimizer.run(fmax=0.04)
-
 
 
 
@@ -250,6 +252,7 @@ if __name__ == "__main__":
                             climb = False
                             )
 
+
         n = CalculationContainer(NEB_interface, neb_args )
         n.run()
 
@@ -302,5 +305,9 @@ if __name__ == "__main__":
                             n_images = 5,
                             climb = False
                             )
+
+        with open("neb_args.pkl", "w") as f:
+            pickle.dump( neb_args, f)
+
         n = CalculationContainer(NEB_interface, neb_args )
         n.run()

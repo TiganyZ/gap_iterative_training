@@ -139,9 +139,14 @@ class GapCalc( Calculation ):
             prefix=f"{self.name}_calc"
             if len(prefix) == 0:
                 prefix = self.name
-            name = self.utils.get_save_name(self.path, self.result, prefix)
-            jsonio.write_json(name, dct)
-            jsonio.write_json(name.replace( ".json", "_extra.json" ), dct_extra)
+
+
+            filename = self.utils.get_save_name(dir, {}, f"{self.name}_{dir}", ext=".json")
+            jsonio.write_json(f"{dir}/{filename}", dct)
+            self.utils.save_file_in_dir(filename, dir, "jsons" )
+
+            jsonio.write_json(f"{dir}/{filename.replace( '.json', '_extra.json' )}", dct_extra)
+            self.utils.save_file_in_dir(filename.replace( '.json', '_extra.json' ), dir, "extra_jsons" )
 
 
             filename = self.utils.get_save_name(dir, {}, f"{self.name}_{dir}", ext=".xyz")

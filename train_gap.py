@@ -46,8 +46,12 @@ class Train:
             if np.all([ os.path.isfile(file) for file in out_files ]):
 
                 if self.delta_gap:
-                    atoms1 = read( out_files[ keys.index("combined") ] )
-                    atoms2 = read( out_files[ keys.index("isolated") ] )
+                    atoms2 = read( out_files[ keys.index("combined") ] )
+
+                    if self.utils.check_key( self.outcars,  "isolated" ):
+                        atoms1 = read( out_files[ keys.index("isolated") ] )
+                    else:
+                        atoms1 = None#Atoms(  )
 
                     atoms = self.get_dbs_data_delta_gap(atoms1, atoms2)
                 else:
@@ -113,14 +117,31 @@ class Train:
         pos = atoms2.get_positions()
         cell = atoms2.get_cell()
         symb = atoms2.get_chemical_symbols()
-        n1 = len(atoms1)
+
+        if atoms1 is None:
+            n1=0
+        else:
+            n1 = len(atoms1)
         n2 = len(atoms2)
         forces = np.zeros([n1+n2, 3])
-        forces[0:n1] = atoms2.get_forces()[0:n1] - atoms1.get_forces()
+
+        if atoms1 is None:
+            forces[0:n1] = atoms2.get_forces()[0:n1] #- atoms1.get_forces()
+        else:
+            forces[0:n1] = atoms2.get_forces()[0:n1] - atoms1.get_forces()
         forces[n1:n2] = atoms2.get_forces()[n1:n2]
-        e = atoms2.get_potential_energy(force_consistent=True) - atoms1.get_potential_energy(force_consistent=True)
+
+        if atoms1 is None:
+            e = atoms2.get_potential_energy(force_consistent=True)# - atoms1.get_potential_energy(force_consistent=True)
+        else:
+            e = atoms2.get_potential_energy(force_consistent=True) - atoms1.get_potential_energy(force_consistent=True)
         v = atoms2.get_volume()
-        virial = -v*(atoms2.get_stress(voigt=False) - atoms1.get_stress(voigt=False))
+
+        if atoms1 is None:
+            virial = -v*(atoms2.get_stress(voigt=False))# - atoms1.get_stress(voigt=False))
+        else:
+            virial = -v*(atoms2.get_stress(voigt=False) - atoms1.get_stress(voigt=False))
+
         atoms = Atoms(symb, cell=cell, positions=pos, pbc=True)
         atoms.info["free_energy"] = e
         atoms.info["virial"] = virial
@@ -268,6 +289,7 @@ if __name__ == "__main__":
     # atoms2 = read( out_files[ keys.index("isolated") ] )
 
     info = {"previous_database": "./train.xyz",
+
             "sigma_e" : {"default": 0.001,
                          "nanoporous": 0.002,
                          "graphite_v1": 0.0005,
@@ -278,6 +300,7 @@ if __name__ == "__main__":
                          "graphite_v6": 0.0005,
                          "graphite_v7": 0.0005,
                          "dimer": 0.0005},
+
             "sigma_v" : {"default": 0.1,
                        "nanoporous": 0.2,
                        "graphite_v1": 0.05,
