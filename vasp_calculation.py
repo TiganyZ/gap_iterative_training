@@ -19,6 +19,45 @@ class VaspCalc( Calculation ):
 
         self.structure = self.args.structure
 
+    def check_vasp_input_args(self):
+
+        default_input_args = {"prec" : "Accurate",
+                              "ibrion" : 2,
+                              "encut" : 650,
+                              "ediff" : 1.0e-08,
+                              "ediffg" : -1e-03,
+                              "ismear" : 0,
+                              "sigma" : 0.1,
+                              "algo" : "fast",
+                              "lwave" : False,
+                              "lcharg" : False,
+                              "istart" : 0,
+                              "nsw" : 0,
+                              "ncore" : 16 ,
+                              "isif" : 2,
+                              "kspacing" : 0.25,
+                              "kgamma" : True,
+                              }
+
+        for k,v in self.args.input_args.items():
+            if k in default_input_args.keys():
+                # Compare the values
+                default = default_input_args[k]
+
+                if default /= v:
+                    print(f"""
+                    ########################################################################################################################
+                    ###---   VASP KEY CHECK: Input for {k} = {v} is not equal to default {k} = {default}: Make sure you know why!!!   ---###
+                    ########################################################################################################################
+                    """)
+            else:
+               print(f"""
+               ####################################################################################################################
+               ###---   VASP KEY CHECK: {k} is not in default arg list for standard calculation. Make sure this is correct   ---###
+               ####################################################################################################################
+               """)
+
+        
     def __str__(self):
         return f"{self.name} = (args = {self.args.__str__()}, result = {self.result})"
 
@@ -35,6 +74,8 @@ class VaspCalc( Calculation ):
         else:
             self.path = os.path.abspath("./")
 
+
+        self.check_vasp_input_args()
 
         self.args.input_args["directory"] = self.path
         self.structure.calc = Vasp( **self.args.input_args )

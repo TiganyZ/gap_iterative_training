@@ -162,7 +162,7 @@ class Train:
         if (new_struc in se.keys()) or (new_struc in sv.keys()):
             print("""
             ##########################################################################################################
-            ###---   WARNING!! The name of the additional structures is already in the database!! Change this   ---###
+            ###---   WARNING!! The name of the additional structures is already in the database!! Change name   ---###
             ##########################################################################################################
             """)
         else:

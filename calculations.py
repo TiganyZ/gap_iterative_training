@@ -7,6 +7,7 @@ from ase.io import read, write
 from ase.calculators.vasp import Vasp
 import os, shutil, subprocess
 from utils import Utils
+from ase.optimize import BFGS
 
 # from process_calculation import GAP_to_VASP, VASP_to_GAP
 
@@ -25,6 +26,9 @@ class CalculationData:
     make_dirs: bool = True
     driver_args: dict = field(default_factory=dict)
     batch: bool = False
+    run_calc_type = "energy"
+    run_calc_args = None
+    
 
 
 
@@ -53,19 +57,25 @@ class CalculationUtils:
 
 
     def determine_calculation_type(self, args):
-        calc_types = [ "energy" ]
+        calc_types = [ "energy", "optimize" ]
 
-        calc_type = "energy"
-        for c in calc_types:
-            if hasattr(args, c):
-                calc_type = c
+        calc_type = args.run_calc_type
+        calc_args = args.run_calc_args
 
-        return calc_type
+        if not (calc_type in calc_types):
+            print(f"""
+            #################################################################################
+            ###---   WARNING: {calc_type} not in the implemented calc types: Exiting   ---###
+            #################################################################################
+            """)
+            raise ValueError
+        else:
+            return calc_type, calc_args
 
 
     def run(self, structure, args):
 
-        calc_type = self.determine_calculation_type(args)
+        calc_type, calc_args = self.determine_calculation_type(args)
 
         if structure is None:
             print(f"""
@@ -77,16 +87,28 @@ class CalculationUtils:
 
         result = {"calc_type" : calc_type}
 
+
         if calc_type == "energy":
             print(structure)
-            res =  structure.get_potential_energy()
+            res =  run_calc(structure.get_potential_energy, calc_args)
 
+        if calc_type = "optimize":
+            res = BFGS( structure, traj = f"{calc_type}_{self.name}.traj" )
+            run_calc(res.run, calc_args)
 
         result["result"] = res
 
         print(result)
         return result
         
+
+    def run_calc(self, func, args):
+        if args is not None:
+            return func(**args)
+        else:
+            return func()
+
+
 
 
 class CalculationContainer:
