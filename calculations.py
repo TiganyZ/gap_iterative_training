@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 from abc import ABC, abstractmethod
-from typing import Type, TypeVar
+from typing import Type, TypeVar, Union
 from datetime import datetime
 from ase import Atoms
 from ase.io import read, write
@@ -26,8 +26,8 @@ class CalculationData:
     make_dirs: bool = True
     driver_args: dict = field(default_factory=dict)
     batch: bool = False
-    run_calc_type = "energy"
-    run_calc_args = None
+    run_calc_type: str = "energy"
+    run_calc_args: Union[dict, None] = None
     
 
 
@@ -73,7 +73,7 @@ class CalculationUtils:
             return calc_type, calc_args
 
 
-    def run(self, structure, args):
+    def run(self, structure, args, name="", path="."):
 
         calc_type, calc_args = self.determine_calculation_type(args)
 
@@ -90,11 +90,13 @@ class CalculationUtils:
 
         if calc_type == "energy":
             print(structure)
-            res =  run_calc(structure.get_potential_energy, calc_args)
+            res =  self.run_calc(structure.get_potential_energy, calc_args)
 
-        if calc_type = "optimize":
-            res = BFGS( structure, traj = f"{calc_type}_{self.name}.traj" )
-            run_calc(res.run, calc_args)
+        if calc_type == "optimize":
+            res = BFGS( structure, trajectory = f"{path}/{calc_type}_{name}.traj" )
+            self.run_calc(res.run, calc_args)
+            write(f"{path}/{calc_type}_{name}.xyz", read(f"{path}/{calc_type}_{name}.traj"), format="extxyz")
+
 
         result["result"] = res
 
@@ -243,8 +245,9 @@ if __name__ == "__main__":
                         "command": "srun"}
 
 
+        os.environ["VASP_PP_PATH"] = "/projappl/project_2006384/vasp/potentials"
         args = CalculationData( binary              = binary,
-                                potential_directory = potential_directory,
+                                potential_directory = "",
                                 input_directory     = input_directory,
                                 output_directory    = output_directory,
                                 structure           = structure,

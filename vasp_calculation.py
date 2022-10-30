@@ -44,7 +44,7 @@ class VaspCalc( Calculation ):
                 # Compare the values
                 default = default_input_args[k]
 
-                if default /= v:
+                if default != v:
                     print(f"""
                     ########################################################################################################################
                     ###---   VASP KEY CHECK: Input for {k} = {v} is not equal to default {k} = {default}: Make sure you know why!!!   ---###
@@ -65,7 +65,11 @@ class VaspCalc( Calculation ):
         # Copy gap files from directory to where the calculation is
         out_dir = self.args.output_directory
         pot_dir = self.args.potential_directory
-        self.pot_path = os.path.abspath(f"{pot_dir}/POTCAR" )
+
+        if pot_dir is not "":
+            self.pot_path = os.path.abspath(f"{pot_dir}/POTCAR" )
+        else:
+            self.pot_path = ""
 
 
         if self.args.make_dirs:

@@ -10,7 +10,7 @@ from calculations import Calculation, CalculationUtils, CalculationContainer
 
 class GapCalc( Calculation ):
     def __init__(self, args):
-        self.name = "GapCalc"
+        self.name = "{args.system}_GapCalc"
         self.args = args # This is the calculation data
         self.utils = Utils()
         self.calc_utils = CalculationUtils()
@@ -65,18 +65,18 @@ class GapCalc( Calculation ):
 
     def run(self):
         # Create the input file for the directory and then compute
-        self.result = self.calc_utils.run(self.structure, self.args)
+        self.result = self.calc_utils.run(self.structure, self.args, path=self.path)
 
         return self.result
 
 
     def setup_quip(self, pot_file, out_dir):
         print(">>>   Setting up QUIP gap calculation <<<")
-        gap = Potential(param_filename=pot_file, directory = out_dir)
+        gap = Potential(param_filename=pot_file) #, directory = out_dir)
         self.structure.set_calculator(gap)
         print(">>>   Assigning calculator <<<")
         self.calc_func = Potential
-        self.calc_args = {"param_filename":self.pot_path, "directory" : out_dir}
+        self.calc_args = {"param_filename":self.pot_path, "directory" : self.path}
 
 
 
@@ -94,9 +94,9 @@ class GapCalc( Calculation ):
 
         if len(prefix) == 0:
             prefix = self.name
-        name = self.utils.get_save_name(self.path, self.result, prefix)
-        jsonio.write_json(name, dct)
-        jsonio.write_json(name.replace( ".json", "_extra.json" ), dct_extra)
+        name = self.utils.get_save_name(self.path, self.result), prefix
+        jsonio.write_json(os.path.join(self.path, name), dct)
+        jsonio.write_json(os.path.join(self.path, name.replace( ".json", "_extra.json" )), dct_extra)
 
 
     def save_get_forces(self, atoms, name="", dir="00"):
