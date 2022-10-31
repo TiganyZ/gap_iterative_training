@@ -88,15 +88,17 @@ class Utils:
 
 
 
-    def check_keys(self, dic, keys = ( "input_directory", "potential_directory", "output_directory" )):
+    def check_keys(self, dic, keys = ( "input_directory", "potential_directory", "output_directory" ), verbosity=0):
+
 
         for key in keys:
             if not self.check_key(dic, key):
-                print(f"""\n{dic}\n\n
-                ########################################################
-                ###---   WARNING! The key = {key} is not found!   ---###
-                ########################################################\n   --> Exiting <--\n""")
-                exit(1)
+                if verbosity > 50:
+                    print(f"""\n{dic}\n\n
+                    ########################################################
+                    ###---   WARNING! The key = {key} is not found!   ---###
+                    ########################################################\n """)
+                raise ValueError
 
 
 
@@ -150,12 +152,11 @@ class Utils:
     def check_file(self, directory, file, stop=False):
         if not os.path.exists(f"{directory}/{file}"):
             print(f"""
-            ################################################################
-            ###---   WARNING! There is no path {directory}/{file} !   ---###
-            ################################################################\n""")
+            !!!!-->   WARNING! There is no path {directory}/{file} !   <--!!!!
+ \n""")
             if stop:
                 print("\n  --> Rectify this <--\n  I'm leaving you...")
-                exit(1)
+                raise ValueError
             else:
                 return False
         else:
@@ -191,7 +192,7 @@ class Utils:
             ###---   WARNING! Something has gone wrong with the subprocess {out.args}   ---###
             ##################################################################################
             """)
-            exit(1)
+            raise RuntimeError
 
         elif verbosity > 50:
             print(f"CHECK_SUBPROCESS: {out}")

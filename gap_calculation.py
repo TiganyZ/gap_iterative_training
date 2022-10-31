@@ -10,7 +10,7 @@ from calculations import Calculation, CalculationUtils, CalculationContainer
 
 class GapCalc( Calculation ):
     def __init__(self, args):
-        self.name = "{args.system}_GapCalc"
+        self.name = f"{args.system}_GapCalc"
         self.args = args # This is the calculation data
         self.utils = Utils()
         self.calc_utils = CalculationUtils()
@@ -44,12 +44,12 @@ class GapCalc( Calculation ):
 
     def get_potential_files(self, out_dir):
         self.pot_files = []
-        for key in ["pot1", "pot2"]
-        if self.utils.check_key(self.args.input_args, key):
-            self.pot_files.append( self.find_potential_file(self.args.input_args[key], out_dir))
-            self.args.input_args[key] = self.pot_files[-1]
-        else:
-            self.pot_files.append( self.find_potential_file("{self.system}.xml", out_dir))
+        for key in ["pot1", "pot2"]:
+            if self.utils.check_key(self.args.input_args, key):
+                self.pot_files.append( self.find_potential_file(self.args.input_args[key], out_dir))
+                self.args.input_args[key] = self.pot_files[-1]
+            else:
+                self.pot_files.append( self.find_potential_file(f"{self.system}.xml", out_dir))
 
 
 
@@ -80,7 +80,7 @@ class GapCalc( Calculation ):
 
     def run(self):
         # Create the input file for the directory and then compute
-        self.result = self.calc_utils.run(self.structure, self.args, path=self.path)
+        self.result = self.calc_utils.run(self.structure, self.args, name=self.name, path=self.path)
 
         return self.result
 
@@ -90,12 +90,14 @@ class GapCalc( Calculation ):
         self.get_potential_files(out_dir)
 
         if len(self.pot_files) == 2:
-            gap = Potential(
-                pot1 = Potential( param_filename = self.pot_files[0]),
-                pot2 = Potential( param_filename = self.pot_files[1])
-            )
-            self.calc_args = { "pot1" : Potential( param_filename = self.pot_files[0]),
-                               "pot2" : Potential( param_filename = self.pot_files[1]),
+            print(self.pot_files)
+            pot1 = Potential( param_filename = self.pot_files[0])
+            pot2 = Potential( param_filename = self.pot_files[1])
+
+            gap = Potential(args_str = "Sum", pot1=pot1, pot2=pot2 )
+            self.calc_args = { "args_str" : "Sum",
+                               "pot1" : pot1,
+                               "pot2" : pot2,
                                "directory" : self.path}
         else:
             gap = Potential( param_filename=self.pot_file[0]) #, directory = out_dir)
@@ -121,7 +123,7 @@ class GapCalc( Calculation ):
 
         if len(prefix) == 0:
             prefix = self.name
-        name = self.utils.get_save_name(self.path, self.result), prefix
+        name = self.utils.get_save_name(self.path, self.result, prefix)
         jsonio.write_json(os.path.join(self.path, name), dct)
         jsonio.write_json(os.path.join(self.path, name.replace( ".json", "_extra.json" )), dct_extra)
 
