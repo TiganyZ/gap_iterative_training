@@ -23,17 +23,17 @@ class GapCalc( Calculation ):
 
 
 
-    def find_potential_file(self, directory):
+    def find_potential_file(self, file, directory):
         # First check this current directory
-        pot_file = self.utils.check_file_dir_subdir(f'{self.args.system}.xml', dir='.', subdir="gap_files")
+        pot_file = self.utils.check_file_dir_subdir(file, dir='.', subdir="gap_files")
 
         if pot_file is None:
-            pot_file = self.utils.check_file_dir_subdir(f'{self.args.system}.xml', dir=directory, subdir="gap_files")
+            pot_file = self.utils.check_file_dir_subdir(file, dir=directory, subdir="gap_files")
 
         if pot_file is None:
             print(f"""
             ###################################################################################################################################################
-            ###---   FATAL: Could not find the potential file {self.args['system']}.xml in ./ or ./gap_files or {directory} or {directory}/gap_files   ---###
+            ###---   FATAL: Could not find the potential file {file} in ./ or ./gap_files or {directory} or {directory}/gap_files   ---###
             ###################################################################################################################################################
 
             """)
@@ -41,23 +41,38 @@ class GapCalc( Calculation ):
         else:
             return os.path.abspath(pot_file)
 
+
+    def get_potential_files(self, out_dir):
+        self.pot_files = []
+        for key in ["pot1", "pot2"]
+        if self.utils.check_key(self.args.input_args, key):
+            self.pot_files.append( self.find_potential_file(self.args.input_args[key], out_dir))
+            self.args.input_args[key] = self.pot_files[-1]
+        else:
+            self.pot_files.append( self.find_potential_file("{self.system}.xml", out_dir))
+
+
+
     def copy_potential(self, dir):
         out_dir = self.args.output_directory
-        pot_file = self.find_potential_file(out_dir)
-        name = pot_file.split("/")[-1]
-        shutil.copy(pot_file, f"{dir}/{name}")
+
+        for pot_file in self.pot_files:
+            name = pot_file.split("/")[-1]
+            shutil.copy(pot_file, f"{dir}/{name}")
+
 
     def setup(self):
         # Copy gap files from directory to where the calculation is
 
         out_dir = self.args.output_directory
-        pot_file = self.find_potential_file(out_dir)
-
+        self.pot_path = os.path.abspath(self.args.potential_directory)
         self.path = os.path.abspath(out_dir)
-        self.pot_path = os.path.abspath(pot_file)
+        #        self.pot_path = os.path.abspath(pot_file)
 
         if self.utils.check_key(self.args.input_args, "quip"):
-            self.setup_quip(pot_file, out_dir)
+            self.args.input_args.pop("quip")
+            self.setup_quip(out_dir)
+
         else:
             self.setup_turbogap()
 
@@ -70,13 +85,25 @@ class GapCalc( Calculation ):
         return self.result
 
 
-    def setup_quip(self, pot_file, out_dir):
+    def setup_quip(self, out_dir):
         print(">>>   Setting up QUIP gap calculation <<<")
-        gap = Potential(param_filename=pot_file) #, directory = out_dir)
+        self.get_potential_files(out_dir)
+
+        if len(self.pot_files) == 2:
+            gap = Potential(
+                pot1 = Potential( param_filename = self.pot_files[0]),
+                pot2 = Potential( param_filename = self.pot_files[1])
+            )
+            self.calc_args = { "pot1" : Potential( param_filename = self.pot_files[0]),
+                               "pot2" : Potential( param_filename = self.pot_files[1]),
+                               "directory" : self.path}
+        else:
+            gap = Potential( param_filename=self.pot_file[0]) #, directory = out_dir)
+            self.calc_args = {"param_filename":self.pot_file[0], "directory" : self.path}
         self.structure.set_calculator(gap)
         print(">>>   Assigning calculator <<<")
         self.calc_func = Potential
-        self.calc_args = {"param_filename":self.pot_path, "directory" : self.path}
+
 
 
 

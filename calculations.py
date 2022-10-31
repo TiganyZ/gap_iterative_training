@@ -95,7 +95,7 @@ class CalculationUtils:
         if calc_type == "optimize":
             res = BFGS( structure, trajectory = f"{path}/{calc_type}_{name}.traj" )
             self.run_calc(res.run, calc_args)
-            write(f"{path}/{calc_type}_{name}.xyz", read(f"{path}/{calc_type}_{name}.traj"), format="extxyz")
+            write(f"{path}/{calc_type}_{name}.xyz", read(f"{path}/{calc_type}_{name}.traj"), index=':' format="extxyz")
 
 
         result["result"] = res
@@ -181,7 +181,9 @@ if __name__ == "__main__":
 
         structure = read(f"{input_directory}/POSCAR", format="vasp")
 
-        gap_input_args = {"quip" : True}
+        gap_input_args = {"quip" : True,
+                          "pot1" : "carbon.xml",
+                          "pot2" : "CBr.xml"}
 
         system = "CBr"
 
