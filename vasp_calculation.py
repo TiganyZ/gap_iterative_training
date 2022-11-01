@@ -199,7 +199,7 @@ exitcode = os.system('srun -n {ncores} {binary}')
             #self.structure.calc.write_json(name)
 
             self.save_vasp_files(atoms, dir)
-
+            self.save_state()
 
             return forces
 

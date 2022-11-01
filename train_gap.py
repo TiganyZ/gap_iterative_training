@@ -10,6 +10,16 @@ import os, shutil, subprocess, re
 import numpy as np
 from utils import Utils
 
+from dataclasses import dataclass
+
+@dataclass
+class TrainData:
+    system: str
+    outcars: dict
+    delta_gap: bool
+    
+    
+
 
 
 

@@ -185,7 +185,7 @@ class GapCalc( Calculation ):
 
 
             self.save_gap_files(atoms, dir)
-
+            self.save_state()
 
             return forces
 

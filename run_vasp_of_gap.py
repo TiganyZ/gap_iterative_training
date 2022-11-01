@@ -65,4 +65,4 @@ d = CalculationContainer(calculation_method,  args )
 d.method.name = f"{d.method.name}_{base}"
 d.run()
 
-print(d.method.result)
+print(d.method.args.result)

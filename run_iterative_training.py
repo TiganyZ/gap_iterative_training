@@ -1,64 +1,51 @@
 #!/usr/bin/python3
-"""This is the main file for the running of iterative training.
-
-The purpose of this program of to automate the iterative training of a
-GAP using ase. This general purpose use will then be used to
-iteratively train a NEB.
-
-Can flesh out some bits here
-
-
-"""
-#!/usr/bin/python3
-
-from abc import ABC, abstractmethod
-from typing import Type, TypeVar
-from datetime import datetime
-from ase import Atoms
-from ase.io import read, write
-from ase.calculators.vasp import Vasp
+from calculations import CalculationData, CalculationContainer
+from train_gap import Train
 import os, shutil, subprocess
-
-from utils import Utils
-from process_calculation import GAP_to_VASP, VASP_to_GAP
+from ase.io import read, write
 
 
+system = "CBr"
+
+d="outcars_combined"
+outcars_combined = [ os.path.join(d,i) for i in os.listdir(d) ]
+d="outcars_isolated"
+outcars_isolated = [ os.path.join(d,i) for i in os.listdir() ] 
+
+outcars= {"combined": outcars_combined,
+          "isolated": outcars_isolated }
+
+info = {"previous_database": "./train.xyz",
+
+        "sigma_e" : {"default": 0.001,
+                     "nanoporous": 0.002,
+                     "graphite_v1": 0.0005,
+                     "graphite_v2": 0.0005,
+                     "graphite_v3": 0.0005,
+                     "graphite_v4": 0.0005,
+                     "graphite_v5": 0.0005,
+                     "graphite_v6": 0.0005,
+                     "graphite_v7": 0.0005,
+                     "dimer": 0.0005},
+
+        "sigma_v" : {"default": 0.1,
+                   "nanoporous": 0.2,
+                   "graphite_v1": 0.05,
+                   "graphite_v2": 0.05,
+                   "graphite_v3": 0.05,
+                   "graphite_v4": 0.05,
+                   "graphite_v5": 0.05,
+                   "graphite_v6": 0.05,
+                   "graphite_v7": 0.05,
+                     "dimer": 0.05},
+        "numbers" : { "C" : 6,             "Br" : 35       },
+        "masses"  : { "C" : 12.01,         "Br" : 79.90412 },
+        "e0"      : { "C" : -.16138053,    "Br" : 0.0      },
+        "l_max" : 8,
+        "n_max" : [8, 8]
+
+        }
 
 
+t = Train( system, outcars, info )
 
-
-
-
-
-
-
-struc = Structure( species, positions, periodicity )
-gap   = calculation( calculation_type="GAP", source="some/directory/gap_files"  )
-
-# Now compose the structures and the calculation type
-# > Run GAP calculation with structure
-r = Run( gap, structure )
-r.run() # This will create a directory for the files etc
-
-
-# Generalise the the RunNEB class
-
-n = RunNEB( [ Run(gap, struc1), Run(gap, struc2)... ]  )
-
-# Now one can get the data from the NEB runs
-
-n.get_final_images() # This has the energy and the configuration
-tst = n.get_tst() # This is a structure type
-
-
-# Now feed this into a DFT calculation
-
-dft = calculation(calculation_type = "VASP")
-d = Run( dft, tst )
-d.run()
-
-# Now get the data from the DFT run and the gap info to retrain
-data = ProcessData( type="FitGAP", d  ) # Know that there is a DFT calculation so will extract energy from there
-data.extract()
-
-retrain = RefitGAP( data, gap )

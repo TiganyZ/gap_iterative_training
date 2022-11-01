@@ -78,11 +78,7 @@ class CalculationUtils:
         calc_args = args.run_calc_args
 
         if not (calc_type in calc_types):
-            print(f"""
-            #################################################################################
-            ###---   WARNING: {calc_type} not in the implemented calc types: Exiting   ---###
-            #################################################################################
-            """)
+            self.utils.print_statement(f"WARNING: {calc_type} not in the implemented calc types")
             raise ValueError
         else:
             return calc_type, calc_args
@@ -93,12 +89,8 @@ class CalculationUtils:
         calc_type, calc_args = self.determine_calculation_type(args)
 
         if structure is None:
-            print(f"""
-            ###############################################################################
-            ###---   FATAL: Structure not provided for the {calc_type} calculation   ---###
-            ###############################################################################
-            """)
-            exit(1)
+            self.utils.print_statement(f"FATAL: Structure not provided for the {calc_type} calculation")
+            raise ValueError
 
         result = {"calc_type" : calc_type}
 
