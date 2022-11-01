@@ -48,24 +48,19 @@ class NEB_interface(Calculation):
             self.calc_func = self.args.calc_func
             self.calc_args = self.args.calc_args
         else:
-            print("""
-            ###############################################################################
-            ###---   No calculator found for first image: Running setup to get it    ---###
-            ###############################################################################
-            """)
+            self.utils.print_statement(f"No calculator found for first image: Running setup to get it", warning = "Notice!", buff_char = "-")
 
             self.images[0].setup()
             self.calc_func = self.images[0].calc_func
             self.calc_args = self.images[0].calc_args
             if hasattr(self.images[0], "calc_func") and hasattr(self.images[0],"calc_args"):
-                print(f">>> SUCCESS: got the calculator successfully <<<\n >>> calc_func= {self.images[0].calc_func}\n >>> calc_args= {self.images[0].calc_args}")
+                self.print_statement(f"SUCCESS: got the calculator successfully", buff_char="-", warning=None)
+                self.print_statement(f"calc_func= {self.images[0].calc_func}", buff_char="-", warning=None)
+                self.print_statement(f"calc_args= {self.images[0].calc_args}", buff_char="-", warning=None)
             else:
-                print("""
-            ######################################################################################
-            ###---   WARNING: The first image does not have a calculator defined. Leaving   ---###
-            ######################################################################################
-                """)
-                exit(1)
+                self.print_statement(f"WARNING: The first image does not have a calculator defined.")
+                raise ValueError
+
 
     def setup(self):
         # the input and output directories find all the necessary information.        out
@@ -107,22 +102,13 @@ class NEB_interface(Calculation):
             print(f"> Final   structure:\n > {final.positions}\n > {final.cell}\n > {final.symbols} ")
 
             if len(self.images) == 2:
-                print("""
-                ###################################################################################
-                ###---   Only 2 images: assuming initial and final:  --> Interpolating <--   ---###
-                ###################################################################################
-                """)
-
+                self.utils.print_statement(f"Only 2 images: assuming initial and final:  --> Interpolating <--", warning=None, buff_char="-")
 
                 if hasattr(self.args, "n_images"):
                     self.neb_images = [initial.copy() for _ in range(self.args.n_images -1)] + [final]
                 else:
-                    print("""
-                    #####################################################################################################
-                    ###---   WARNING: number of images for NEB calculation not set. Please add for interpolation   ---###
-                    #####################################################################################################
-                    """)
-                    exit(1)
+                    self.utils.print_statement(f"WARNING: number of images for NEB calculation not set. Please add for interpolation")
+                    raise ValueError
             else:
                 # Get the neb images from the images object
                 self.neb_images = [ image.structure for image in self.images ]
@@ -136,11 +122,6 @@ class NEB_interface(Calculation):
                      self.images[0].copy_potential(self.calc_args["directory"])
                 n.path = os.path.abspath(self.calc_args["directory"])
                 
-                # else:
-                # self.calc_args.pop('directory', None)
-
-                #elif self.calc_args.has_key("directory"):
-
                 n.calc =  self.calc_func( **self.calc_args )
 
                 # Redefine the forces so we can use the training data
