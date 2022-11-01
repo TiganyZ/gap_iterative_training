@@ -115,16 +115,17 @@ class GapCalc( Calculation ):
     def get_data(self):
         pass
 
-    def save_gap_files(self, atoms, dir):
+    def save_gap_files(self, atoms, dir="."):
         from ase.io import jsonio
         dct = self.structure.calc.results  # Get the calculator in a dictionary format
         dct_extra = self.structure.calc.extra_results  # Get the calculator in a dictionary format
 
         prefix = self.name
 
-        name = self.utils.get_save_name(self.path, self.result, prefix)
-        jsonio.write_json(os.path.join(self.path, name), dct)
-        jsonio.write_json(os.path.join(self.path, name.replace( ".json", "_extra.json" )), dct_extra)
+
+        name =self.utils.get_save_name(f"{dir}/jsons", self.result, prefix)
+        jsonio.write_json(os.path.join(f"{dir}/jsons", name), dct)
+        jsonio.write_json(os.path.join(f"{dir}/jsons", name.replace( ".json", "_extra.json" )), dct_extra)
 
         filename = self.utils.get_save_name(f"{dir}/images", {}, f"{prefix}", ext=".xyz")
         write( f"{dir}/images/{filename}", atoms, format="extxyz" )
@@ -135,10 +136,10 @@ class GapCalc( Calculation ):
 
         if hasattr(self, "result"):
             if self.utils.check_key( self.result, "optimized_structure" ):
-                self.save_gap_files(self.result["optimized_structure"], ".")
+                self.save_gap_files(self.result["optimized_structure"], dir=self.path)
                 return None
 
-        self.save_gap_files(self.structure, ".")
+        self.save_gap_files(self.structure, dir=self.path)
         return None
 
 
@@ -185,18 +186,20 @@ class GapCalc( Calculation ):
                 prefix = self.name
 
 
-            filename = self.utils.get_save_name(dir, {}, f"{self.name}_{dir}", ext=".json")
-            jsonio.write_json(f"{dir}/{filename}", dct)
-            self.utils.save_file_in_dir(filename, dir, "jsons" )
+            self.save_gap_files(atoms, dir)
 
-            jsonio.write_json(f"{dir}/{filename.replace( '.json', '_extra.json' )}", dct_extra)
-            self.utils.save_file_in_dir(filename.replace( '.json', '_extra.json' ), dir, "extra_jsons" )
+            # filename = self.utils.get_save_name(dir, {}, f"{self.name}_{dir}", ext=".json")
+            # jsonio.write_json(f"{dir}/{filename}", dct)
+            # self.utils.save_file_in_dir(filename, dir, "jsons" )
+
+            # jsonio.write_json(f"{dir}/{filename.replace( '.json', '_extra.json' )}", dct_extra)
+            # self.utils.save_file_in_dir(filename.replace( '.json', '_extra.json' ), dir, "extra_jsons" )
 
 
-            filename = self.utils.get_save_name(dir, {}, f"{self.name}_{dir}", ext=".xyz")
-            write( f"{dir}/{filename}", atoms, format="extxyz" )
+            # filename = self.utils.get_save_name(dir, {}, f"{self.name}_{dir}", ext=".xyz")
+            # write( f"{dir}/{filename}", atoms, format="extxyz" )
 
-            self.utils.save_file_in_dir(filename, dir, "images" )
+            # self.utils.save_file_in_dir(filename, dir, "images" )
 
             return forces
 

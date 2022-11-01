@@ -27,7 +27,7 @@ class CalculationData:
     driver_args: dict = field(default_factory=dict)
     batch: bool = False
     run_calc_type: str = "energy"
-    run_calc_args: Union[dict, None] = None
+    run_calc_args: Union[dict, None]= None
     
 
 
@@ -73,7 +73,7 @@ class CalculationUtils:
             return calc_type, calc_args
 
 
-    def run(self, structure, args, name="", path="."):
+    def run(self, structure, args, name = "", path="."):
 
         calc_type, calc_args = self.determine_calculation_type(args)
 
@@ -97,8 +97,6 @@ class CalculationUtils:
             self.run_calc(res.run, calc_args)
             write(f"{path}/{calc_type}_{name}.xyz", read(f"{path}/{calc_type}_{name}.traj", index=':'), format="extxyz")
             result["optimized_structure"] = read(f"{path}/{calc_type}_{name}.traj")
-
-
 
         result["result"] = res
 
@@ -169,43 +167,45 @@ class CalculationContainer:
 if __name__ == "__main__":
 
     test = "Vasp"
-    #test = "Gap"
+    test = "Gap"
 
 
     if test == "Gap":
 
-        input_directory = "input_dir"
-        output_directory = "output_dir"
-        potential_directory = "input_dir/gap_files"
+        input_directory = "./"
+        output_directory = "output_relaxation"
+        potential_directory = "./gap_files"
 
         binary = "turbogap"
         ncores = 128
 
-        structure = read(f"{input_directory}/POSCAR", format="vasp")
+        structure = read(f"Br_graphene_before_relaxation.xyz", format="extxyz")
+        #        structure = read(f"graphene_before_relaxation.xyz", format="extxyz")
+
 
         gap_input_args = {"quip" : True,
                           "pot1" : "carbon.xml",
                           "pot2" : "CBr.xml"}
 
         system = "CBr"
-
-        args ={ "binary"              : binary,
-                "potential_directory" : potential_directory,
-                "input_directory"     : input_directory,
-                "output_directory"    : output_directory,
-                "input_args"          : gap_input_args,
-                "structure"           : structure,
-                "ncores"              : ncores,
-                "system"              : system
-
-        }
+        args = CalculationData( binary              = binary,
+                                potential_directory = potential_directory,
+                                input_directory     = input_directory,
+                                output_directory    = output_directory,
+                                structure           = structure,
+                                input_args          = gap_input_args,
+                                ncores              = ncores,
+                                system              = system, 
+                                run_calc_type       = "optimize",
+                                run_calc_args       = { "fmax" : 0.001 }
+                               )
 
         from gap_calculation import GapCalc
 
         calculation_method = GapCalc
 
         c = CalculationContainer(calculation_method,  args )
-
+        c.method.name = "CBr_Br_ads_graphene_initial"
         c.run()
 
         print(c.method.result)
@@ -249,9 +249,8 @@ if __name__ == "__main__":
                         "command": "srun"}
 
 
-        os.environ["VASP_PP_PATH"] = "/projappl/project_2006384/vasp/potentials"
         args = CalculationData( binary              = binary,
-                                potential_directory = "",
+                                potential_directory = potential_directory,
                                 input_directory     = input_directory,
                                 output_directory    = output_directory,
                                 structure           = structure,

@@ -10,7 +10,7 @@ from calculations import Calculation, CalculationUtils, CalculationContainer
 class VaspCalc( Calculation ):
 
     def __init__(self, args):
-        self.name = "VaspCalc"
+        self.name = f"{args.system}_VaspCalc"
         self.args = args
         self.utils = Utils()
         self.calc_utils = CalculationUtils()
@@ -66,7 +66,7 @@ class VaspCalc( Calculation ):
         out_dir = self.args.output_directory
         pot_dir = self.args.potential_directory
 
-        if pot_dir is not "":
+        if pot_dir != "":
             self.pot_path = os.path.abspath(f"{pot_dir}/POTCAR" )
         else:
             self.pot_path = ""
@@ -145,10 +145,10 @@ exitcode = os.system('srun -n {ncores} {binary}')
 
         if hasattr(self, "result"):
             if self.utils.check_key( self.result, "optimized_structure" ):
-                self.save_vasp_files(self.result["optimized_structure"], ".")
+                self.save_vasp_files(self.result["optimized_structure"], dir=self.path)
                 return None
 
-        self.save_vasp_files(self.structure, ".")
+        self.save_vasp_files(self.structure, dir=self.path)
         return None
 
         
@@ -168,7 +168,7 @@ exitcode = os.system('srun -n {ncores} {binary}')
 """)
 
 
-    def save_vasp_files(self, atoms, dir):
+    def save_vasp_files(self, atoms, dir="."):
         filename = self.utils.get_save_name(f"{dir}/jsons", {}, f"{self.name}_calc")
         atoms.calc.write_json(f"jsons/{filename}")
         #self.utils.save_file_in_dir(filename, dir, "jsons" )

@@ -87,6 +87,7 @@ class NEB_interface(Calculation):
 
 
 
+
     def get_all_images(self):
 
         self.get_calc()
@@ -132,6 +133,8 @@ class NEB_interface(Calculation):
                 if not os.path.exists(self.calc_args["directory"]):
                      os.mkdir(self.calc_args["directory"])
                      self.images[0].copy_potential(self.calc_args["directory"])
+                n.path = os.path.abspath(self.calc_args["directory"])
+                
                 # else:
                 # self.calc_args.pop('directory', None)
 
@@ -159,12 +162,12 @@ class NEB_interface(Calculation):
     def get_data(self):
         pass
 
-    def save(self, name):
+    def save(self):
 
         images = self.neb.images
 
         for i, image in enumerate(images):
-            images.save(f"neb_save_{image.name}_image_{i}")
+            image.save(f"neb_save_{image.name}_image_{i}")
 
 
 if __name__ == "__main__":
