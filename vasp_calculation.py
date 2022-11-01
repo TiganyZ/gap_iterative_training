@@ -142,8 +142,16 @@ exitcode = os.system('srun -n {ncores} {binary}')
 
         if len(prefix) == 0:
             prefix = self.name
-        name = self.utils.get_save_name(self.path, self.result, prefix)
-        self.structure.calc.write_json(name)
+
+        if hasattr(self, "result"):
+            if self.utils.check_key( self.result, "optimized_structure" ):
+                self.save_vasp_files(self.result["optimized_structure"], ".")
+                return None
+
+        self.save_vasp_files(self.structure, ".")
+        return None
+
+        
 
 
     def check_convergence(self):
@@ -158,6 +166,19 @@ exitcode = os.system('srun -n {ncores} {binary}')
             ###################################################################################################
 
 """)
+
+
+    def save_vasp_files(self, atoms, dir):
+        filename = self.utils.get_save_name(f"{dir}/jsons", {}, f"{self.name}_calc")
+        atoms.calc.write_json(f"jsons/{filename}")
+        #self.utils.save_file_in_dir(filename, dir, "jsons" )
+
+        filename = self.utils.get_save_name(f"{dir}/outcars", {}, "OUTCAR", ext="")
+        shutil.copy(f"{dir}/OUTCAR", f"{dir}/outcars/{filename}" )
+        #self.utils.save_file_in_dir("OUTCAR", dir, "outcars" )
+
+        filename = self.utils.get_save_name(f"{dir}/images", {}, f"{self.name}", ext=".xyz")
+        write( f"{dir}/images/{filename}", atoms, format="extxyz" )
 
 
     def save_get_forces(self, atoms, name="", dir="00"):
@@ -194,17 +215,18 @@ exitcode = os.system('srun -n {ncores} {binary}')
 
             #self.structure.calc.write_json(name)
 
-            filename = self.utils.get_save_name(f"{dir}/jsons", {}, f"{self.name}_calc")
-            atoms.calc.write_json(f"jsons/{filename}")
-            #self.utils.save_file_in_dir(filename, dir, "jsons" )
+            self.save_vasp_files(atoms, dir)
+            # filename = self.utils.get_save_name(f"{dir}/jsons", {}, f"{self.name}_calc")
+            # atoms.calc.write_json(f"jsons/{filename}")
+            # #self.utils.save_file_in_dir(filename, dir, "jsons" )
 
-            filename = self.utils.get_save_name(f"{dir}/outcars", {}, "OUTCAR", ext="")
-            shutil.copy(f"{dir}/OUTCAR", f"{dir}/outcars/{filename}" )
-            #self.utils.save_file_in_dir("OUTCAR", dir, "outcars" )
+            # filename = self.utils.get_save_name(f"{dir}/outcars", {}, "OUTCAR", ext="")
+            # shutil.copy(f"{dir}/OUTCAR", f"{dir}/outcars/{filename}" )
+            # #self.utils.save_file_in_dir("OUTCAR", dir, "outcars" )
 
-            filename = self.utils.get_save_name(f"{dir}/images", {}, f"{self.name}_{dir}", ext=".xyz")
-            write( f"{dir}/images/{filename}", atoms, format="extxyz" )
-                #self.utils.save_file_in_dir(filename, dir, "images" )
+            # filename = self.utils.get_save_name(f"{dir}/images", {}, f"{self.name}_{dir}", ext=".xyz")
+            # write( f"{dir}/images/{filename}", atoms, format="extxyz" )
+            #     #self.utils.save_file_in_dir(filename, dir, "images" )
 
 
             return forces

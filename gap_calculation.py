@@ -115,17 +115,32 @@ class GapCalc( Calculation ):
     def get_data(self):
         pass
 
-    def save(self, prefix=''):
-        # Write the json file
+    def save_gap_files(self, atoms, dir):
         from ase.io import jsonio
         dct = self.structure.calc.results  # Get the calculator in a dictionary format
         dct_extra = self.structure.calc.extra_results  # Get the calculator in a dictionary format
 
-        if len(prefix) == 0:
-            prefix = self.name
+        prefix = self.name
+
         name = self.utils.get_save_name(self.path, self.result, prefix)
         jsonio.write_json(os.path.join(self.path, name), dct)
         jsonio.write_json(os.path.join(self.path, name.replace( ".json", "_extra.json" )), dct_extra)
+
+        filename = self.utils.get_save_name(f"{dir}/images", {}, f"{prefix}", ext=".xyz")
+        write( f"{dir}/images/{filename}", atoms, format="extxyz" )
+
+    
+    def save(self, prefix=''):
+        # Write the json file
+
+        if hasattr(self, "result"):
+            if self.utils.check_key( self.result, "optimized_structure" ):
+                self.save_gap_files(self.result["optimized_structure"], ".")
+                return None
+
+        self.save_gap_files(self.structure, ".")
+        return None
+
 
 
     def save_get_forces(self, atoms, name="", dir="00"):

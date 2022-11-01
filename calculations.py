@@ -95,7 +95,9 @@ class CalculationUtils:
         if calc_type == "optimize":
             res = BFGS( structure, trajectory = f"{path}/{calc_type}_{name}.traj" )
             self.run_calc(res.run, calc_args)
-            write(f"{path}/{calc_type}_{name}.xyz", read(f"{path}/{calc_type}_{name}.traj"), index=':' format="extxyz")
+            write(f"{path}/{calc_type}_{name}.xyz", read(f"{path}/{calc_type}_{name}.traj", index=':'), format="extxyz")
+            result["optimized_structure"] = read(f"{path}/{calc_type}_{name}.traj")
+
 
 
         result["result"] = res
