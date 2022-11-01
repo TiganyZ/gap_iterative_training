@@ -8,6 +8,7 @@ from ase.calculators.vasp import Vasp
 import os, shutil, subprocess
 from utils import Utils
 from ase.optimize import BFGS
+from json import JSONEncoder
 
 # from process_calculation import GAP_to_VASP, VASP_to_GAP
 
@@ -28,7 +29,17 @@ class CalculationData:
     batch: bool = False
     run_calc_type: str = "energy"
     run_calc_args: Union[dict, None]= None
-    
+    result: Union[dict, None]= None
+
+
+class CalculationDataEncoder(JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, Atoms):
+            return obj.__dict__
+        # Base class default() raises TypeError:
+        return JSONEncoder.default(self, obj)
+
+
 
 
 
@@ -44,6 +55,10 @@ class Calculation(ABC):
 
     @abstractmethod
     def save():
+        pass
+
+    @abstractmethod
+    def save_state():
         pass
 
     @abstractmethod
@@ -150,17 +165,21 @@ class CalculationContainer:
     def run(self):
 
         self.method.utils.wrap_function(f"{self.method_name}.setup", self.method.setup, "setup")
+        self.method.save_state()
         self.run_setup = True
 
         self.method.utils.wrap_function(f"{self.method_name}.run", self.method.run, "calculating")
+        self.method.save_state()
         self.run_calculation = True
 
         self.method.utils.wrap_function(f"{self.method_name}.save", self.method.save, "saving")
+        self.method.save_state()
         self.saved_calculation = True
 
-        self.method.result["method"] = self.method_name
+        self.method.args.result["method"] = self.method_name
 
         self.method.get_data()
+        self.method.save_state()
         self.run_get_data = True
 
 

@@ -4,7 +4,7 @@ from ase.io import read, write
 from ase.calculators.vasp import Vasp
 import os, shutil, subprocess
 from utils import Utils
-from calculations import Calculation, CalculationUtils, CalculationContainer
+from calculations import Calculation, CalculationDataEncoder, CalculationUtils, CalculationContainer
 
 
 class VaspCalc( Calculation ):
@@ -14,7 +14,7 @@ class VaspCalc( Calculation ):
         self.args = args
         self.utils = Utils()
         self.calc_utils = CalculationUtils()
-        self.result = {}
+        self.args.result = {}
         self.counter = 0
 
         self.structure = self.args.structure
@@ -45,21 +45,14 @@ class VaspCalc( Calculation ):
                 default = default_input_args[k]
 
                 if default != v:
-                    print(f"""
-                    ########################################################################################################################
-                    ###---   VASP KEY CHECK: Input for {k} = {v} is not equal to default {k} = {default}: Make sure you know why!!!   ---###
-                    ########################################################################################################################
-                    """)
+                    self.utils.print_statement(f"VASP KEY CHECK: Input for {k} = {v} is not equal to default {k} = {default}: Make sure you know why!!!")
+
             else:
-               print(f"""
-               ####################################################################################################################
-               ###---   VASP KEY CHECK: {k} is not in default arg list for standard calculation. Make sure this is correct   ---###
-               ####################################################################################################################
-               """)
+                self.utils.print_statement(f"VASP KEY CHECK: {k} is not in default arg list for standard calculation. Make sure this is correct")
 
         
     def __str__(self):
-        return f"{self.name} = (args = {self.args.__str__()}, result = {self.result})"
+        return f"{self.name} = (args = {self.args.__str__()}, result = {self.args.result})"
 
     def setup(self):
         # Copy gap files from directory to where the calculation is
@@ -121,20 +114,10 @@ exitcode = os.system('srun -n {ncores} {binary}')
 
     def run(self):
 
+        self.args.result = self.calc_utils.run(self.structure, self.args)
+        self.check_convergence()
 
-        # Create the input file for the directory and then compute
-        # self.utils.check_keys(self.args, keys=( "structure", "input_args" ) )
-
-        # self.structure.calc = Vasp( **self.args.input_args )
-        # self.calc = Vasp( **self.args.input_args )
-
-        # print(self.structure.calc)
-        self.result = self.calc_utils.run(self.structure, self.args)
-
-        # print("VASP ENERGY RESULT: ", self.result)
-        # self.result = {"result":self.result}#self.calc_utils.run(self.structure, self.args)
-
-        return self.result
+        return self.args.result
 
 
 
@@ -143,12 +126,13 @@ exitcode = os.system('srun -n {ncores} {binary}')
         if len(prefix) == 0:
             prefix = self.name
 
-        if hasattr(self, "result"):
-            if self.utils.check_key( self.result, "optimized_structure" ):
-                self.save_vasp_files(self.result["optimized_structure"], dir=self.path)
+        if self.args.results is not None:
+            if self.utils.check_key( self.args.result, "optimized_structure" ):
+                self.save_vasp_files(self.args.result["optimized_structure"], dir=self.path)
                 return None
 
         self.save_vasp_files(self.structure, dir=self.path)
+
         return None
 
         
@@ -160,22 +144,21 @@ exitcode = os.system('srun -n {ncores} {binary}')
             print(f">>> CHECK CONVERGENCE {self.name}: Has calculation converged? {self.converged}")
 
         else:
-            print("""
-            ###################################################################################################
-            ###---   WARNING: Convergence for the calculation has not been reached. Check OUTCAR file.   ---###
-            ###################################################################################################
+            self.utils.print_statement(f"Convergence for the calculation has not been reached. Check OUTCAR file.")
 
-""")
+
+
+    def save_state(self):
+        filename = self.utils.get_save_name(f"{self.path}/state", {}, f"CalculationState_{self.name}")
+        jsonio.write_json( f"{dir}/state/{filename}", self.args.__dict__)
 
 
     def save_vasp_files(self, atoms, dir="."):
         filename = self.utils.get_save_name(f"{dir}/jsons", {}, f"{self.name}_calc")
         atoms.calc.write_json(f"jsons/{filename}")
-        #self.utils.save_file_in_dir(filename, dir, "jsons" )
 
         filename = self.utils.get_save_name(f"{dir}/outcars", {}, "OUTCAR", ext="")
         shutil.copy(f"{dir}/OUTCAR", f"{dir}/outcars/{filename}" )
-        #self.utils.save_file_in_dir("OUTCAR", dir, "outcars" )
 
         filename = self.utils.get_save_name(f"{dir}/images", {}, f"{self.name}", ext=".xyz")
         write( f"{dir}/images/{filename}", atoms, format="extxyz" )
@@ -216,17 +199,6 @@ exitcode = os.system('srun -n {ncores} {binary}')
             #self.structure.calc.write_json(name)
 
             self.save_vasp_files(atoms, dir)
-            # filename = self.utils.get_save_name(f"{dir}/jsons", {}, f"{self.name}_calc")
-            # atoms.calc.write_json(f"jsons/{filename}")
-            # #self.utils.save_file_in_dir(filename, dir, "jsons" )
-
-            # filename = self.utils.get_save_name(f"{dir}/outcars", {}, "OUTCAR", ext="")
-            # shutil.copy(f"{dir}/OUTCAR", f"{dir}/outcars/{filename}" )
-            # #self.utils.save_file_in_dir("OUTCAR", dir, "outcars" )
-
-            # filename = self.utils.get_save_name(f"{dir}/images", {}, f"{self.name}_{dir}", ext=".xyz")
-            # write( f"{dir}/images/{filename}", atoms, format="extxyz" )
-            #     #self.utils.save_file_in_dir(filename, dir, "images" )
 
 
             return forces

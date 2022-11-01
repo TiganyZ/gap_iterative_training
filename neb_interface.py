@@ -21,6 +21,7 @@ class NEB_data:
     input_directory: str = "./"
     output_directory: str = "neb_calc"
     read_traj: str = ""
+    result: Union[dict, None]= None
 
 
 
@@ -170,6 +171,11 @@ class NEB_interface(Calculation):
             image.save(f"neb_save_{image.name}_image_{i}")
 
 
+    def save_state(self):
+        filename = self.utils.get_save_name(f"{self.path}/state", {}, f"CalculationState_{self.name}")
+        jsonio.write_json( f"{dir}/state/{filename}", self.args.__dict__)
+
+
 if __name__ == "__main__":
 
 
@@ -309,7 +315,7 @@ if __name__ == "__main__":
                             climb = False
                             )
 
-        with open("neb_args.pkl", "w") as f:
+        with open("neb_args.pkl", "wb") as f:
             pickle.dump( neb_args, f)
 
         n = CalculationContainer(NEB_interface, neb_args )

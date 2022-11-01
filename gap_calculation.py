@@ -6,7 +6,7 @@ import os, shutil, subprocess
 from quippy.potential import Potential
 from utils import Utils
 from calculations import Calculation, CalculationUtils, CalculationContainer
-
+from ase.io import jsonio
 
 class GapCalc( Calculation ):
     def __init__(self, args):
@@ -15,11 +15,11 @@ class GapCalc( Calculation ):
         self.utils = Utils()
         self.calc_utils = CalculationUtils()
 
-        self.result = {}
+        self.args.result = {}
         self.structure = self.args.structure
 
     def __str__(self):
-        return f"{self.name} = (args = {self.args.__str__()}, result = {self.result})"
+        return f"{self.name} = (args = {self.args.__str__()}, result = {self.args.result})"
 
 
 
@@ -31,13 +31,8 @@ class GapCalc( Calculation ):
             pot_file = self.utils.check_file_dir_subdir(file, dir=directory, subdir="gap_files")
 
         if pot_file is None:
-            print(f"""
-            ###################################################################################################################################################
-            ###---   FATAL: Could not find the potential file {file} in ./ or ./gap_files or {directory} or {directory}/gap_files   ---###
-            ###################################################################################################################################################
-
-            """)
-            exit(1)
+            self.utils.print_statement(f"FATAL: Could not find the potential file {file} in ./ or ./gap_files or {directory} or {directory}/gap_files", buff_char="!")
+            raise ValueError
         else:
             return os.path.abspath(pot_file)
 
@@ -80,9 +75,9 @@ class GapCalc( Calculation ):
 
     def run(self):
         # Create the input file for the directory and then compute
-        self.result = self.calc_utils.run(self.structure, self.args, name=self.name, path=self.path)
+        self.args.result = self.calc_utils.run(self.structure, self.args, name=self.name, path=self.path)
 
-        return self.result
+        return self.args.result
 
 
     def setup_quip(self, out_dir):
@@ -115,31 +110,38 @@ class GapCalc( Calculation ):
     def get_data(self):
         pass
 
+
+    def save_state(self):
+        filename = self.utils.get_save_name(f"{self.path}/state", {}, f"CalculationState_{self.name}")
+        jsonio.write_json( f"{dir}/state/{filename}", self.args.__dict__)
+
+
     def save_gap_files(self, atoms, dir="."):
-        from ase.io import jsonio
         dct = self.structure.calc.results  # Get the calculator in a dictionary format
         dct_extra = self.structure.calc.extra_results  # Get the calculator in a dictionary format
 
         prefix = self.name
 
 
-        name =self.utils.get_save_name(f"{dir}/jsons", self.result, prefix)
+        name =self.utils.get_save_name(f"{dir}/jsons", self.args.result, prefix)
         jsonio.write_json(os.path.join(f"{dir}/jsons", name), dct)
         jsonio.write_json(os.path.join(f"{dir}/jsons", name.replace( ".json", "_extra.json" )), dct_extra)
 
         filename = self.utils.get_save_name(f"{dir}/images", {}, f"{prefix}", ext=".xyz")
         write( f"{dir}/images/{filename}", atoms, format="extxyz" )
 
+
     
     def save(self, prefix=''):
         # Write the json file
 
-        if hasattr(self, "result"):
-            if self.utils.check_key( self.result, "optimized_structure" ):
-                self.save_gap_files(self.result["optimized_structure"], dir=self.path)
+        if self.args.result is not None:
+            if self.utils.check_key( self.args.result, "optimized_structure" ):
+                self.save_gap_files(self.args.result["optimized_structure"], dir=self.path)
                 return None
 
         self.save_gap_files(self.structure, dir=self.path)
+
         return None
 
 
@@ -176,10 +178,6 @@ class GapCalc( Calculation ):
                     if not md or hasattr(constraint, 'adjust_potential_energy'):
                         constraint.adjust_forces(atoms, forces)
 
-            #self.structure.calc.write_json(name)
-            from ase.io import jsonio
-            dct = atoms.calc.results  # Get the calculator in a dictionary format
-            dct_extra = atoms.calc.extra_results  # Get the calculator in a dictionary format
 
             prefix=f"{self.name}_calc"
             if len(prefix) == 0:
@@ -188,18 +186,6 @@ class GapCalc( Calculation ):
 
             self.save_gap_files(atoms, dir)
 
-            # filename = self.utils.get_save_name(dir, {}, f"{self.name}_{dir}", ext=".json")
-            # jsonio.write_json(f"{dir}/{filename}", dct)
-            # self.utils.save_file_in_dir(filename, dir, "jsons" )
-
-            # jsonio.write_json(f"{dir}/{filename.replace( '.json', '_extra.json' )}", dct_extra)
-            # self.utils.save_file_in_dir(filename.replace( '.json', '_extra.json' ), dir, "extra_jsons" )
-
-
-            # filename = self.utils.get_save_name(dir, {}, f"{self.name}_{dir}", ext=".xyz")
-            # write( f"{dir}/{filename}", atoms, format="extxyz" )
-
-            # self.utils.save_file_in_dir(filename, dir, "images" )
 
             return forces
 

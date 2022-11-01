@@ -5,6 +5,166 @@ from glob import glob
 
 class Utils:
 
+    def print_statement(self, message, warning = "WARNING: ", buff_char = "#"):
+        # Add other characters to the message
+        if warning is None:
+            warning = ""
+        message = buff_char*3 + "-->   " + warning + message + "   <--" + buff_char*3
+        buff = buff_char * len(message)
+
+        print("\n" + buff + "\n" + message + "\n" + buff + "\n")
+
+    
+
+    def wrap_function(self, prefix, function, message):
+        print(f"> {prefix}:          {message} ")
+        function()
+        print(f"> {prefix}: SUCCESS: {message} \n")
+
+        return True
+
+
+    ##############################
+    ###---   Dictionaries   ---###
+    ##############################
+
+    def check_key(self, dic, key):
+        ret = False
+        if key in dic.keys():
+            ret = True
+        else:
+            ret = False
+        return ret
+
+
+
+    def check_keys(self, dic, keys = ( "input_directory", "potential_directory", "output_directory" ), verbosity=0):
+        for key in keys:
+            if not self.check_key(dic, key):
+                if verbosity > 50:
+                    print(f"\n{dic}")
+                    self.print_statement(message, f"The key = {key} is not found!")
+                raise ValueError
+
+
+
+    #####################################################
+    ###---   Copying and checking for files/dirs   ---###
+    #####################################################
+
+    def check_copy_tree(self, src, dst):
+        # Check that directory dst does not exist
+        if not os.path.exists(dst):
+            shutil.copytree(src, dst)
+        else:
+            ldst = glob(f"{dst}/*/", recursive = True)
+            lsrc = glob(f"{src}/*/", recursive = True)
+
+            for dir in lsrc:
+                if dir in ldst:
+                    print(f"check_copy_tree: {src}/{dir} has same name as {dst}/dir. Copying just the files")
+                    for f in os.listdir(src):
+                        if os.path.isfile(f):
+                            end_dir = dir.split("/")[-1]
+                            print(f"check_copy_tree: copying {src}/{f} to {dst}/{end_dir}/")
+                            shutil.copy(f, f"{dst}/{end_dir}/")
+
+    def copy_only_files(self, src, dst):
+        files = os.listdir(src)
+        for f in files:
+            if os.path.isfile(f):
+                print(f"Utils.copy_only_files: copying {f}, {dst}")
+                shutil.copy(f, f"{dst}/")
+
+
+    def check_file_dir_subdir(self, file, dir ='.', subdir="gap_files"):
+        if self.check_file(dir, file):
+            self.print_statement(f"Found file {file} in ./ directory", warning=None)
+
+        elif self.check_file(f"{dir}/{subdir}", file):
+            self.print_statement(f"Found file {file} in {subdir} subdirectory", warning=None)
+            file = f"{dir}/{subdir}/{file}"
+        else:
+            self.print_statement(f"No file {file} in directory or {subdir} subdirectory.")
+
+        return file
+
+
+
+    def check_file(self, directory, file, stop=False):
+        if not os.path.exists(f"{directory}/{file}"):
+            self.print_statement(f"There is no path {directory}/{file}")
+            if stop:
+                print("\n  --> Rectify this <--\n  I'm leaving you...")
+                raise ValueError
+            else:
+                return False
+        else:
+            return True
+
+    def check_copy_file(self, directory, file, output_directory):
+        if self.check_file(directory, file) and os.path.exists(f"{output_directory}"):
+            shutil.copy( f"{directory}/{file}", f"{output_directory}/" )
+
+
+    #################################
+    ###---   Subprocess & os   ---###
+    #################################
+
+    def piped_subprocess(self, commands, file=None):
+        for i, cmd in enumerate(commands.split("|")):
+            print(cmd.split())
+            if i == 0:
+                p = subprocess.Popen(cmd.split(), stdout = subprocess.PIPE )
+            if i == len(commands.split("|"))-1 and file is not None:
+                p = subprocess.Popen(cmd.split(), stdin=p.stdout, stdout=file  )
+            else:
+                p = subprocess.Popen(cmd.split(), stdin=p.stdout, stdout = subprocess.PIPE )
+
+            p.wait()
+            self.check_subprocess(p)
+
+        out, errs = p.communicate()
+        return out
+
+    def check_subprocess(self, out, verbosity=100):
+        print(out)
+
+        if out.returncode != 0:
+            self.print_statement(f"WARNING! Something has gone wrong with the subprocess {out.args}")
+            raise RuntimeError
+
+        elif verbosity > 50:
+            print(f"CHECK_SUBPROCESS: {out}")
+
+
+    ########################
+    ###---   Saving   ---###
+    ########################
+
+    def get_save_name(self, path, result, prefix, ext=".json"):
+        if not os.path.exists(path):
+            os.mkdir(path)
+
+        l = os.listdir(path)
+
+        if len(prefix) == 0:
+            name = '_'.join( list(result.keys()) )
+        else:
+            name = prefix
+        suffix=''
+        counter = 0
+        while name+suffix+ext in l:
+            suffix = f"_{counter:d}"
+            counter += 1
+
+        return name+suffix+ext
+
+
+    ##################################################################################
+    ###---   Generating driver file if necessary for some future calculations   ---###
+    ##################################################################################
+
     def get_driver_template(self, driver_args, just_command=True, job_blurb=None):
 
         if self.check_key(driver_args, "modules"):
@@ -38,22 +198,22 @@ class Utils:
 
             """ % ( driver_args )
         else:
-            driver_template = job_blurb + """                                                                                                       
+            driver_template = job_blurb + """
 
-            module reset                                                                                                                        
+            module reset
             %(all_modules)s
             set -xe
 
-            %(all_exports)s                                                                                                                     
+            %(all_exports)s
 
-            %(command)s -n %(ncores)s %(binary)s                                                                                                
+            %(command)s -n %(ncores)s %(binary)s
 
             """
             driver_template = driver_template % ( driver_args )
-    
-            
+
+
         if just_command:
-            driver_template = """                                                                                                   
+            driver_template = """
             #!/bin/bash
             %(all_modules)s
 
@@ -65,184 +225,3 @@ class Utils:
 
 
         return driver_template
-
-
-
-
-    
-    def wrap_function(self, prefix, function, message):
-        print(f"> {prefix}:          {message} ")
-        function()
-        print(f"> {prefix}: SUCCESS: {message} \n")
-
-        return True
-
-
-    def check_key(self, dic, key):
-        ret = False
-        if key in dic.keys():
-            ret = True
-        else:
-            ret = False
-        return ret
-
-
-
-    def check_keys(self, dic, keys = ( "input_directory", "potential_directory", "output_directory" ), verbosity=0):
-
-
-        for key in keys:
-            if not self.check_key(dic, key):
-                if verbosity > 50:
-                    print(f"""\n{dic}\n\n
-                    ########################################################
-                    ###---   WARNING! The key = {key} is not found!   ---###
-                    ########################################################\n """)
-                raise ValueError
-
-
-
-    def check_copy_tree(self, src, dst):
-        # Check that directory dst does not exist
-        if not os.path.exists(dst):
-            shutil.copytree(src, dst)
-        else:
-            ldst = glob(f"{dst}/*/", recursive = True)
-            lsrc = glob(f"{src}/*/", recursive = True)
-
-            for dir in lsrc:
-                if dir in ldst:
-                    print(f"check_copy_tree: {src}/{dir} has same name as {dst}/dir. Copying just the files")
-                    for f in os.listdir(src):
-                        if os.path.isfile(f):
-                            end_dir = dir.split("/")[-1]
-                            print(f"check_copy_tree: copying {src}/{f} to {dst}/{end_dir}/")
-                            shutil.copy(f, f"{dst}/{end_dir}/")
-
-    def copy_only_files(self, src, dst):
-        files = os.listdir(src)
-        for f in files:
-            if os.path.isfile(f):
-                print(f"Utils.copy_only_files: copying {f}, {dst}")
-                shutil.copy(f, f"{dst}/")
-
-
-    def check_file_dir_subdir(self, file, dir ='.', subdir="gap_files"):
-        if self.check_file(dir, file):
-            print(f"""
-            -->   Found file {file} in ./ directory    <--
-            """)
-        elif self.check_file(f"{dir}/{subdir}", file):
-            print(f"""
-            -->   Found file {file} in {subdir} subdirectory    <--
-            """)
-            file = f"{dir}/{subdir}/{file}"
-        else:
-            print(f"""
-                ###############################################################################
-                ###---   FATAL: No file {file} in directory or {subdir} subdirectory.    ---###
-                ###############################################################################
-                """)
-            return None
-
-        return file
-
-
-
-    def check_file(self, directory, file, stop=False):
-        if not os.path.exists(f"{directory}/{file}"):
-            print(f"""
-            !!!!-->   WARNING! There is no path {directory}/{file} !   <--!!!!
- \n""")
-            if stop:
-                print("\n  --> Rectify this <--\n  I'm leaving you...")
-                raise ValueError
-            else:
-                return False
-        else:
-            return True
-
-    def check_copy_file(self, directory, file, output_directory):
-        if self.check_file(directory, file) and os.path.exists(f"{output_directory}"):
-            shutil.copy( f"{directory}/{file}", f"{output_directory}/" )
-
-
-    def piped_subprocess(self, commands, file=None):
-        for i, cmd in enumerate(commands.split("|")):
-            print(cmd.split())
-            if i == 0:
-                p = subprocess.Popen(cmd.split(), stdout = subprocess.PIPE )
-            if i == len(commands.split("|"))-1 and file is not None:
-                p = subprocess.Popen(cmd.split(), stdin=p.stdout, stdout=file  )
-            else:
-                p = subprocess.Popen(cmd.split(), stdin=p.stdout, stdout = subprocess.PIPE )
-
-            p.wait()
-            self.check_subprocess(p)
-
-        out, errs = p.communicate()
-        return out
-
-    def check_subprocess(self, out, verbosity=100):
-        print(out)
-
-        if out.returncode != 0:
-            print(f"""
-            ##################################################################################
-            ###---   WARNING! Something has gone wrong with the subprocess {out.args}   ---###
-            ##################################################################################
-            """)
-            raise RuntimeError
-
-        elif verbosity > 50:
-            print(f"CHECK_SUBPROCESS: {out}")
-
-
-    def get_save_name(self, path, result, prefix, ext=".json"):
-        if not os.path.exists(path):
-            os.mkdir(path)
-
-        l = os.listdir(path)
-
-        if len(prefix) == 0:
-            name = '_'.join( list(result.keys()) )
-        else:
-            name = prefix
-        suffix=''
-        counter = 0
-        while name+suffix+ext in l:
-            suffix = f"_{counter:d}"
-            counter += 1
-
-        return name+suffix+ext
-
-    def get_filename_for_dir(self, file, n_files):
-        f = file.split(".")
-        if len(f) == 1:
-            filename = f"{file}_{n_files}"
-        else:
-            f[-1] = f"_{n_files}." + f[-1]
-            filename = ''.join(f)
-
-        return filename
-
-
-
-    def save_file_in_dir(self, file, dir, savedir ):
-        if os.path.exists(f"{dir}/{file}"):
-            if not os.path.exists(f"{dir}/{savedir}"):
-                os.mkdir(f"{dir}/{savedir}")
-            n_files = len(os.listdir(f"{dir}/{savedir}"))
-            if n_files > 0:
-                # Check if the file is the same or not
-                prev_filename = self.get_filename_for_dir(file, n_files-1)
-                cmd = f"diff {dir}/{file} {dir}/{savedir}/{prev_filename} | wc -l"
-                print(cmd)
-                l = self.piped_subprocess(cmd)
-                if int(l) > 0:
-                    filename = self.get_filename_for_dir(file, n_files)
-                    shutil.copy(f"{dir}/{file}", f"{dir}/{savedir}/{filename}")
-
-            else:
-                filename = self.get_filename_for_dir(file, n_files)
-                shutil.copy(f"{dir}/{file}", f"{dir}/{savedir}/{filename}")
