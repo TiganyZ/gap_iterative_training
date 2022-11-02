@@ -14,9 +14,12 @@ from dataclasses import dataclass
 
 @dataclass
 class TrainData:
+    name: str
     system: str
     outcars: dict
     delta_gap: bool
+    train_file: str
+    info: dict
     
     
 
@@ -27,11 +30,11 @@ class TrainData:
 class Train:
     # Not creating abstract class because we will only be training GAPs
 
-    def __init__(self, system, outcars, info, sigma_e = 0.0002, sigma_v = 0.02, delta_gap = False, name="", train_file_name="train.xyz", verbosity=100):
+    def __init__(self, name,  system, outcars, info, sigma_e = 0.0002, sigma_v = 0.02, delta_gap = False, train_file_name="train.xyz", verbosity=100):
+        self.name = name
         self.system = system
         self.outcars = outcars # Dictionary of outcars { "C+element": [out1, out2], "C":[out1, out2] }
         self.delta_gap = delta_gap
-        self.name = name
         self.elements = re.findall('[A-Z][^A-Z]*', system)
         self.train_file_name = train_file_name
         self.verbosity = verbosity
@@ -170,11 +173,7 @@ class Train:
 
         new_struc = f"{self.dbs_name}"
         if (new_struc in se.keys()) or (new_struc in sv.keys()):
-            print("""
-            ##########################################################################################################
-            ###---   WARNING!! The name of the additional structures is already in the database!! Change name   ---###
-            ##########################################################################################################
-            """)
+            self.utils.print_statement(f"The name of the additional structures is already in the database!! Change name")
         else:
             se[f"{self.dbs_name}"] = sigma_e
             sv[f"{self.dbs_name}"] = sigma_v

@@ -10,7 +10,7 @@ system = "CBr"
 d="outcars_combined"
 outcars_combined = [ os.path.join(d,i) for i in os.listdir(d) ]
 d="outcars_isolated"
-outcars_isolated = [ os.path.join(d,i) for i in os.listdir() ] 
+outcars_isolated = [ os.path.join(d,i) for i in os.listdir(d) ]
 
 outcars= {"combined": outcars_combined,
           "isolated": outcars_isolated }
