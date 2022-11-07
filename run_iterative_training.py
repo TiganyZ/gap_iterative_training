@@ -1,11 +1,21 @@
 #!/usr/bin/python3
 from calculations import CalculationData, CalculationContainer
 from train_gap import Train
-import os, shutil, subprocess
+import os, shutil, subprocess, sys
 from ase.io import read, write
 
+if len(sys.argv) > 2:
+    name = sys.argv[1]
+else:
+    name="graphene_relax"
 
-name="graphene_relax"
+if len(sys.argv) >= 4:
+    previous_gap = sys.argv[2]
+    previous_database = sys.argv[3]
+else:
+    previous_gap = "~/Documents/Br_C_GAP/for_tigany/dimer/refit_dimer_to_spin-orbit/CBr/so_z_antiparallel_new_8/gap/gap_files"
+    previous_database = "./train_NPC_graphite_dimer_so_z.xyz"
+
 
 system = "CBr"
 
@@ -17,9 +27,11 @@ outcars_isolated = [ os.path.join(d,i) for i in os.listdir(d) ]
 outcars= {"combined": outcars_combined,
           "isolated": outcars_isolated }
 
-previous_gap = "~/Documents/Br_C_GAP/for_tigany/dimer/refit_dimer_to_spin-orbit/CBr/so_z_antiparallel_new_8/gap/gap_files"  #"../../../prev_gap/gap_files"
 
-info = {"previous_database": "./train_NPC_graphite_dimer_so_z.xyz",
+
+info = {
+
+    "previous_database": previous_database,
 
         "sigma_e" : {"default": 0.001,
                      "nanoporous": 0.002,
