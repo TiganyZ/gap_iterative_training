@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 import os, subprocess, shutil
 from glob import glob
+from functools import partial 
 
 
 class Utils:
@@ -14,7 +15,18 @@ class Utils:
 
         print("\n" + buff + "\n" + message + "\n" + buff + "\n")
 
+    def warning(self, message):
+        return self.print_statement(message, buff_char="!")
     
+    def notice(self, message):
+        return self.print_statement(message, warning="NOTICE: ", buff_char="~")
+    
+    def success(self, message):
+        return self.print_statement(message, warning="SUCCESS: ", buff_char="-")
+
+    def fatal(self, message):
+        return self.print_statement(message, warning="FATAL: ", buff_char="#")
+        
 
     def wrap_function(self, prefix, function, message):
         print(f"> {prefix}:          {message} ")
@@ -92,8 +104,8 @@ class Utils:
 
 
     def check_file(self, directory, file, stop=False):
-        if not os.path.exists(f"{directory}/{file}"):
-            self.print_statement(f"There is no path {directory}/{file}")
+        if not os.path.exists( os.path.normpath( os.path.join(directory,file) ) ):
+            self.print_statement(f"There is no path {os.path.join(directory,file)}!")
             if stop:
                 print("\n  --> Rectify this <--\n  I'm leaving you...")
                 raise ValueError
@@ -104,34 +116,44 @@ class Utils:
 
     def check_copy_file(self, directory, file, output_directory):
         if self.check_file(directory, file) and os.path.exists(f"{output_directory}"):
-            shutil.copy( f"{directory}/{file}", f"{output_directory}/" )
+            shutil.copy( os.path.join(directory,file), f"{output_directory}/" )
 
 
     #################################
     ###---   Subprocess & os   ---###
     #################################
-
     def piped_subprocess(self, commands, file=None):
-        for i, cmd in enumerate(commands.split("|")):
-            print(cmd.split())
-            if i == 0:
-                p = subprocess.Popen(cmd.split(), stdout = subprocess.PIPE )
-            if i == len(commands.split("|"))-1 and file is not None:
-                p = subprocess.Popen(cmd.split(), stdin=p.stdout, stdout=file  )
-            else:
-                p = subprocess.Popen(cmd.split(), stdin=p.stdout, stdout = subprocess.PIPE )
+        if file is not None:
+            with open(file, "w") as fil:
+                out=subprocess.run(commands,  stdout = fil, shell=True)
+                self.check_subprocess(out)
+                return True
+        else:
+            p = subprocess.Popen(commands,  stdout = subprocess.PIPE, shell=True)
+            out, err = p.communicate()
+            return out.decode("utf-8")
+        # p = {}
+        # for i, cmd in enumerate(commands.split("|")):
+        #     print("piped_subprocess > ", i, cmd.split())
+        #     if i == 0:
+        #         p[i] = subprocess.Popen(cmd.split(), stdout = subprocess.PIPE, stderr=subprocess.PIPE )
+        #     elif i == len(commands.split("|"))-1 and file is not None:
+        #         p[i] = subprocess.Popen(cmd.split(), stdin=p[i-1].stdout, stdout=file  )
+        #     else:
+        #         p[i] = subprocess.Popen(cmd.split(), stdin=p[i-1].stdout, stdout = subprocess.PIPE )
 
-            p.wait()
-            self.check_subprocess(p)
+        # for i in reversed(range(len(commands.split("|")))):
+        #     out, errs = p[i].communicate()
 
-        out, errs = p.communicate()
-        return out
+        # self.check_subprocess(p[0], verbosity=100)
+        # return out
 
-    def check_subprocess(self, out, verbosity=100):
+
+    def check_subprocess(self, out, verbosity=50):
         print(out)
 
         if out.returncode != 0:
-            self.print_statement(f"WARNING! Something has gone wrong with the subprocess {out.args}")
+            self.fatal(f"Something has gone wrong with the subprocess \"{out.args}\"")
             raise RuntimeError
 
         elif verbosity > 50:

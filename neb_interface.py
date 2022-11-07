@@ -48,17 +48,17 @@ class NEB_interface(Calculation):
             self.calc_func = self.args.calc_func
             self.calc_args = self.args.calc_args
         else:
-            self.utils.print_statement(f"No calculator found for first image: Running setup to get it", warning = "Notice!", buff_char = "-")
+            self.utils.notice(f"No calculator found for first image: Running setup to get it")
 
             self.images[0].setup()
             self.calc_func = self.images[0].calc_func
             self.calc_args = self.images[0].calc_args
             if hasattr(self.images[0], "calc_func") and hasattr(self.images[0],"calc_args"):
-                self.print_statement(f"SUCCESS: got the calculator successfully", buff_char="-", warning=None)
-                self.print_statement(f"calc_func= {self.images[0].calc_func}", buff_char="-", warning=None)
-                self.print_statement(f"calc_args= {self.images[0].calc_args}", buff_char="-", warning=None)
+                self.utils.success(f"got the calculator successfully")
+                self.utils.notice(f"calc_func= {self.images[0].calc_func}")
+                self.utils.notice(f"calc_args= {self.images[0].calc_args}")
             else:
-                self.print_statement(f"WARNING: The first image does not have a calculator defined.")
+                self.utils.fatal(f"The first image does not have a calculator defined.")
                 raise ValueError
 
 
@@ -102,12 +102,12 @@ class NEB_interface(Calculation):
             print(f"> Final   structure:\n > {final.positions}\n > {final.cell}\n > {final.symbols} ")
 
             if len(self.images) == 2:
-                self.utils.print_statement(f"Only 2 images: assuming initial and final:  --> Interpolating <--", warning=None, buff_char="-")
+                self.utils.notice(f"Only 2 images: assuming initial and final:  --> Interpolating <--")
 
                 if hasattr(self.args, "n_images"):
                     self.neb_images = [initial.copy() for _ in range(self.args.n_images -1)] + [final]
                 else:
-                    self.utils.print_statement(f"WARNING: number of images for NEB calculation not set. Please add for interpolation")
+                    self.utils.fatal(f"number of images for NEB calculation not set. Please add for interpolation")
                     raise ValueError
             else:
                 # Get the neb images from the images object

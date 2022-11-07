@@ -49,12 +49,12 @@ custom_code = True
 # So "default" *needs* to be an entry in the dictionary. sigma_e and sigma_v do not
 # necessarily need to contain all (or the same) config types, only those for which you want
 # to add specific regularization other than the default ones.
-sigma_e = %(sigma_e)s
-sigma_v = %(sigma_v)s
+sigma_e = {sigma_e}
+sigma_v = {sigma_v}
 # Force regularization options. The force fraction will determine how many forces are masked
 # randomly out of the database.
 # must be 0. <= force_fraction <= 1.
-force_fraction = {"default": 1.}
+force_fraction = {default}
 sigma_f_min = 0.1 # minimum force regularization in eV/Angstrom
 f_scale = 0.1 # scaling factor: sigma_f = f_scale * f (if sigma_f > sigma_f_min)
 force_parameter_name = "forces" # what is the force array called?

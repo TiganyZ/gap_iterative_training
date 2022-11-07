@@ -31,7 +31,7 @@ class GapCalc( Calculation ):
             pot_file = self.utils.check_file_dir_subdir(file, dir=directory, subdir="gap_files")
 
         if pot_file is None:
-            self.utils.print_statement(f"FATAL: Could not find the potential file {file} in ./ or ./gap_files or {directory} or {directory}/gap_files", buff_char="!")
+            self.utils.fatal(f"FATAL: Could not find the potential file {file} in ./ or ./gap_files or {directory} or {directory}/gap_files")
             raise ValueError
         else:
             return os.path.abspath(pot_file)

@@ -45,10 +45,10 @@ class VaspCalc( Calculation ):
                 default = default_input_args[k]
 
                 if default != v:
-                    self.utils.print_statement(f"VASP KEY CHECK: Input for {k} = {v} is not equal to default {k} = {default}: Make sure you know why!!!")
+                    self.utils.notice(f"VASP KEY CHECK: Input for {k} = {v} is not equal to default {k} = {default}: Make sure you know why!!!")
 
             else:
-                self.utils.print_statement(f"VASP KEY CHECK: {k} is not in default arg list for standard calculation. Make sure this is correct")
+                self.utils.notice(f"VASP KEY CHECK: {k} is not in default arg list for standard calculation. Make sure this is correct")
 
         
     def __str__(self):
@@ -144,7 +144,7 @@ exitcode = os.system('srun -n {ncores} {binary}')
             print(f">>> CHECK CONVERGENCE {self.name}: Has calculation converged? {self.converged}")
 
         else:
-            self.utils.print_statement(f"Convergence for the calculation has not been reached. Check OUTCAR file.")
+            self.utils.fatal(f"Convergence for the calculation has not been reached. Check OUTCAR file.")
 
 
 
