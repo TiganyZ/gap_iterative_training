@@ -46,6 +46,7 @@ c = CalculationContainer(calculation_method,  args )
 c.method.name = f"{c.method.name}_{base}"
 c.run()
 
+
 print(c.method.args.result)
 
 print(f"\n -> Directory <-\n  {os.getcwd()} \n\n")
@@ -60,6 +61,7 @@ shutil.copy(f"{c.method.path}/{args.run_calc_type}_{c.method.name}.xyz", f"curre
 element = 'Br'
 atoms = read(f"current_calc_GAP_{base}.xyz")
 del atoms[[atom.index for atom in atoms if atom.symbol == element]]
+
 write(f"current_calc_GAP_{base}_no_{element}.xyz", atoms)
 
 

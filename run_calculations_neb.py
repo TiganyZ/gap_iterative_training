@@ -14,8 +14,10 @@ else:
     exit(1)
     
 
+
 head, tail = os.path.split(files[0])
 base = tail.split('.')[0]
+
 istructure = read(files[0])
 fstructure = read(files[1])
 
