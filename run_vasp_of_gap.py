@@ -6,7 +6,18 @@ from ase.io import read, write
 
 print(sys.argv)
 
-file = sys.argv[1]
+
+if len(sys.argv) >= 2:
+    file=sys.argv[1]
+    print(f"###---   Performing VASP relaxation of {file}   ---###")
+if len(sys.argv) >= 3:
+    prefix=sys.argv[2]
+else:
+    prefix="output_relaxation_VASP"
+print(f"         > Directory prefix = {prefix}")
+
+
+
 
 base = file.split('.')[0]
 gap_rel_struc = read(file, format="extxyz")
@@ -50,7 +61,7 @@ u = Utils()
 args = CalculationData( binary              = "/appl/soft/phys/vasp/6.3.0/gcc-11.2.0/bin/vasp_std",
                         potential_directory = "",
                         input_directory     = ".",
-                        output_directory    = f"output_relaxation_VASP_{base}",
+                        output_directory    = f"{prefix}_{base}",
                         structure           = gap_rel_struc,
                         input_args          = vasp_input_args,
                         ncores              = 128,

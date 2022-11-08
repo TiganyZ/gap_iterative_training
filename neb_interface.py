@@ -2,6 +2,7 @@
 from ase import Atoms
 from ase.io import read, write
 from ase.calculators.vasp import Vasp
+from typing import Union
 from ase.neb import NEB
 from ase.optimize import BFGS
 from ase.constraints import FixAtoms
@@ -33,6 +34,7 @@ class NEB_interface(Calculation):
         self.name = "NebCalc"
         self.args = args
         self.images = args.images
+        self.args.result = {}
         self.utils = Utils()
 
         self.climb = self.args.climb
@@ -48,17 +50,17 @@ class NEB_interface(Calculation):
             self.calc_func = self.args.calc_func
             self.calc_args = self.args.calc_args
         else:
-            self.utils.print_statement(f"No calculator found for first image: Running setup to get it", warning = "Notice!", buff_char = "-")
+            self.utils.notice(f"No calculator found for first image: Running setup to get it")
 
             self.images[0].setup()
             self.calc_func = self.images[0].calc_func
             self.calc_args = self.images[0].calc_args
             if hasattr(self.images[0], "calc_func") and hasattr(self.images[0],"calc_args"):
-                self.print_statement(f"SUCCESS: got the calculator successfully", buff_char="-", warning=None)
-                self.print_statement(f"calc_func= {self.images[0].calc_func}", buff_char="-", warning=None)
-                self.print_statement(f"calc_args= {self.images[0].calc_args}", buff_char="-", warning=None)
+                self.utils.success(f"got the calculator successfully")
+                self.utils.notice(f"calc_func= {self.images[0].calc_func}")
+                self.utils.notice(f"calc_args= {self.images[0].calc_args}")
             else:
-                self.print_statement(f"WARNING: The first image does not have a calculator defined.")
+                self.utils.fatal(f"The first image does not have a calculator defined.")
                 raise ValueError
 
 
@@ -78,7 +80,7 @@ class NEB_interface(Calculation):
 
 
     def run(self):
-        optimizer = BFGS(self.neb, trajectory='neb_climb.traj', restart = f"{self.name}_BFGS_restart_file")
+        optimizer = BFGS(self.neb, trajectory='neb_climb.traj')#, restart = f"{self.name}_BFGS_restart_file")
         optimizer.run(fmax=0.04)
 
 
@@ -102,12 +104,12 @@ class NEB_interface(Calculation):
             print(f"> Final   structure:\n > {final.positions}\n > {final.cell}\n > {final.symbols} ")
 
             if len(self.images) == 2:
-                self.utils.print_statement(f"Only 2 images: assuming initial and final:  --> Interpolating <--", warning=None, buff_char="-")
+                self.utils.notice(f"Only 2 images: assuming initial and final:  --> Interpolating <--")
 
                 if hasattr(self.args, "n_images"):
                     self.neb_images = [initial.copy() for _ in range(self.args.n_images -1)] + [final]
                 else:
-                    self.utils.print_statement(f"WARNING: number of images for NEB calculation not set. Please add for interpolation")
+                    self.utils.fatal(f"number of images for NEB calculation not set. Please add for interpolation")
                     raise ValueError
             else:
                 # Get the neb images from the images object
@@ -149,12 +151,15 @@ class NEB_interface(Calculation):
         images = self.neb.images
 
         for i, image in enumerate(images):
-            image.save(f"neb_save_{image.name}_image_{i}")
+            write(f"neb_save_image_{i}.xyz", image, format="extxyz")
+            #            jsonio.write_json( f"neb_save_{image.name}_image_{i}", self.args.__dict__)
 
 
     def save_state(self):
-        filename = self.utils.get_save_name(f"{self.path}/state", {}, f"CalculationState_{self.name}")
-        jsonio.write_json( f"{dir}/state/{filename}", self.args.__dict__)
+        self.save()
+        
+        # filename = self.utils.get_save_name(f"{self.path}/state", {}, f"CalculationState_{self.name}")
+        # jsonio.write_json( f"{self.path}/state/{filename}", self.args.__dict__)
 
 
 if __name__ == "__main__":

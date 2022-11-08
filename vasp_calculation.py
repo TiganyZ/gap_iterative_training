@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 from ase import Atoms
-from ase.io import read, write
+from ase.io import read, write, jsonio
 from ase.calculators.vasp import Vasp
 import os, shutil, subprocess
 from utils import Utils
@@ -45,10 +45,10 @@ class VaspCalc( Calculation ):
                 default = default_input_args[k]
 
                 if default != v:
-                    self.utils.print_statement(f"VASP KEY CHECK: Input for {k} = {v} is not equal to default {k} = {default}: Make sure you know why!!!")
+                    self.utils.notice(f"VASP KEY CHECK: Input for {k} = {v} is not equal to default {k} = {default}: Make sure you know why!!!")
 
             else:
-                self.utils.print_statement(f"VASP KEY CHECK: {k} is not in default arg list for standard calculation. Make sure this is correct")
+                self.utils.notice(f"VASP KEY CHECK: {k} is not in default arg list for standard calculation. Make sure this is correct")
 
         
     def __str__(self):
@@ -126,7 +126,7 @@ exitcode = os.system('srun -n {ncores} {binary}')
         if len(prefix) == 0:
             prefix = self.name
 
-        if self.args.results is not None:
+        if self.args.result is not None:
             if self.utils.check_key( self.args.result, "optimized_structure" ):
                 self.save_vasp_files(self.args.result["optimized_structure"], dir=self.path)
                 return None
@@ -144,13 +144,14 @@ exitcode = os.system('srun -n {ncores} {binary}')
             print(f">>> CHECK CONVERGENCE {self.name}: Has calculation converged? {self.converged}")
 
         else:
-            self.utils.print_statement(f"Convergence for the calculation has not been reached. Check OUTCAR file.")
+            self.utils.fatal(f"Convergence for the calculation has not been reached. Check OUTCAR file.")
 
 
 
     def save_state(self):
+
         filename = self.utils.get_save_name(f"{self.path}/state", {}, f"CalculationState_{self.name}")
-        jsonio.write_json( f"{dir}/state/{filename}", self.args.__dict__)
+        jsonio.write_json( f"{self.path}/state/{filename}", self.args.__dict__)
 
 
     def save_vasp_files(self, atoms, dir="."):

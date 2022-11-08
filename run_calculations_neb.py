@@ -2,17 +2,20 @@
 
 from calculations import CalculationData, CalculationContainer
 from neb_interface import NEB_data, NEB_interface
-import os, shutil, subprocess, pickle
+import os, shutil, subprocess, pickle, sys
 from ase.io import read, write
 
 
 # These are actually the results of a relaxed gap calculation
-# files = [f"C+Br_GapCalc_Br_graphene_before_relaxation.xyz", f"C+Br_GapCalc_Br_graphene_before_relaxation_translated.xyz"]
+if len(sys.argv) >= 3:
+    files = [sys.argv[1], sys.argv[2]]
+else:
+    print("!!! WARNING: There have two files specified for the NEB calculation !!!")
+    exit(1)
+    
 
-files = [f"Br_defected_graphene.xyz", "Br_defected_graphene_translated.xyz"]
-
-
-base = files[0].split('.')[0]
+head, tail = os.path.split(files[0])
+base = tail.split('.')[0]
 istructure = read(files[0])
 fstructure = read(files[1])
 
@@ -69,34 +72,61 @@ n = CalculationContainer(NEB_interface, neb_args )
 n.method.name = f"{n.method.name}_{base}"
 n.run()
 
+# Running the NEB calculation there will be a neb_calc folder by default
+
+relfiles = []
+for i in range(1, neb_args.n_images - 1):
+    # copy the images to the current folder
+    idir=f"0{i}/images"
+    # Now get the latest file
+
+    if not os.path.exists(idir):
+        os.makedirs(idir, exist_ok=True)
+
+    l = (os.listdir(idir))
+    counter =0
+    lm = l[0]
+    nlp=0
+    for j, lj in enumerate(l):
+        try:
+            nl = int( (lj.split('.')[0]).split('_')[-1] )
+            if nl > nlp:
+                lm = lj
+                nlp = nl
+            else:
+                continue
+        except ValueError:
+            continue
+    print(f">> Last image found: {lm} in {idir}\n>> Copying to ./relaxed_neb_image_0{i}_{base}.xyz")
+    
+    final_relaxed = lm #max(, key=os.path.getctime)
+    
+    shutil.copy(f"{idir}/{final_relaxed}", f"../relaxed_neb_image_0{i}_{base}.xyz")
+    # Add this to the list of vasp calculations to be done.
+    # Now pass on to vasp, if there are two potentials, then make two vasp calculations
+    # Delete the br species
+    relfiles.append(f"relaxed_neb_image_0{i}_{base}.xyz")
+    
+    element = 'Br'
+    atoms = read(f"../relaxed_neb_image_0{i}_{base}.xyz")
+    del atoms[[atom.index for atom in atoms if atom.symbol == element]]
+    write(f"../relaxed_neb_image_0{i}_{base}_no_{element}.xyz", atoms)
+    relfiles.append(f"relaxed_neb_image_0{i}_{base}_no_{element}.xyz")
 
 
-# print(f"\n -> Directory <-\n  {os.getcwd()} \n\n")
-# # Now create DFT calculation with this structure
+os.chdir("../")
+vfile = "run_vasp_of_gap.py"
+for rstr in relfiles:
+    output = "vasp_calculations_to_run.sh"
+    command = f"python3.9 {vfile} {rstr}\n"
 
-# # Final trajectory is in the path
+    if os.path.exists(output):
+        mode = 'a'
+    else:
+        mode = 'w'
 
-# shutil.copy(f"{c.method.path}/{args.run_calc_type}_{c.method.name}.xyz", f"current_calc_GAP_{base}.xyz")
+    with open(output, mode) as f:
+        f.write( command )
 
-# # Now pass on to vasp
-
-# # Now have completed vasp calculaton
-# print(f"file = \"current_calc_GAP_{base}.xyz\"")
-
-# from utils import Utils
-# u = Utils()
-
-# vfile = "run_vasp_of_gap.py"
-# rstr=f"current_calc_GAP_{base}.xyz"
-
-# output = "vasp_calculations_to_run.sh"
-# command = f"python3.9 {vfile} {rstr}\n"
-
-# if os.path.exists(output):
-#     mode = 'a'
-# else:
-#     mode = 'w'
-
-# with open(output, mode) as f:
-#     f.write( command )
-
+    
+    
